@@ -1,13 +1,19 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=28 format=2]
 
 [ext_resource path="res://assets/test/test.png" type="Texture" id=1]
 [ext_resource path="res://assets/froggie/froggie.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/frogcoin/frogcoin.tscn" type="PackedScene" id=3]
 [ext_resource path="res://assets/obstacles/spike1.png" type="Texture" id=4]
 [ext_resource path="res://assets/froggie/swing_point.tscn" type="PackedScene" id=5]
-
-[sub_resource type="Environment" id=1]
-background_color = Color( 0.592157, 0.894118, 0.87451, 1 )
+[ext_resource path="res://assets/environment/water_uv_offset.png" type="Texture" id=6]
+[ext_resource path="res://assets/environment/water_normal.png" type="Texture" id=7]
+[ext_resource path="res://assets/environment/water_diffuse.png" type="Texture" id=8]
+[ext_resource path="res://assets/environment/water_sidescroll_2D_full.shader" type="Shader" id=9]
+[ext_resource path="res://assets/environment/WaterSidescroll2D.gd" type="Script" id=10]
+[ext_resource path="res://assets/environment/clouds_noise1.tres" type="Texture" id=11]
+[ext_resource path="res://assets/environment/clouds2D.shader" type="Shader" id=12]
+[ext_resource path="res://assets/environment/clouds_noise2.tres" type="Texture" id=13]
+[ext_resource path="res://assets/environment/light.png" type="Texture" id=14]
 
 [sub_resource type="Animation" id=7]
 length = 0.001
@@ -64,6 +70,25 @@ tracks/1/keys = {
 "values": [ true, false ]
 }
 
+[sub_resource type="Gradient" id=15]
+offsets = PoolRealArray( 0.484848, 0.558442 )
+colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
+
+[sub_resource type="GradientTexture" id=16]
+gradient = SubResource( 15 )
+
+[sub_resource type="ShaderMaterial" id=14]
+shader = ExtResource( 12 )
+shader_param/tint = Color( 0.709804, 0.945098, 1, 1 )
+shader_param/scroll_direction1 = Vector2( 0.7, -0.7 )
+shader_param/time_scale1 = 0.006
+shader_param/tile_factor1 = 0.371
+shader_param/scroll_direction2 = Vector2( 0.75, 0 )
+shader_param/time_scale2 = 0.005
+shader_param/tile_factor2 = 0.488
+shader_param/noise_texture2 = ExtResource( 13 )
+shader_param/gradient_texture = SubResource( 16 )
+
 [sub_resource type="RectangleShape2D" id=6]
 extents = Vector2( 201.578, 72.835 )
 
@@ -71,6 +96,10 @@ extents = Vector2( 201.578, 72.835 )
 min_value = 0.25
 max_value = 5.0
 _data = [ Vector2( 0, 0.25 ), 0.0, 6.3, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="Gradient" id=19]
+offsets = PoolRealArray( 0.10757, 1 )
+colors = PoolColorArray( 0.930176, 0.563192, 0.563192, 1, 0.937988, 0.494642, 0.494642, 1 )
 
 [sub_resource type="GDScript" id=9]
 script/source = "extends Area2D
@@ -93,10 +122,35 @@ func _on_swing_zone_body_exited(body):
 [sub_resource type="CircleShape2D" id=10]
 radius = 300.0
 
-[node name="test" type="Node2D"]
+[sub_resource type="Gradient" id=11]
+offsets = PoolRealArray( 0.502164, 1 )
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource( 1 )
+[sub_resource type="GradientTexture" id=12]
+gradient = SubResource( 11 )
+
+[sub_resource type="ShaderMaterial" id=13]
+shader = ExtResource( 9 )
+shader_param/water_tint = Color( 0.160784, 0.470588, 0.619608, 1 )
+shader_param/shadow_color = Color( 0.0156863, 0.184314, 0.243137, 1 )
+shader_param/distortion_scale = Vector2( 0.868, 0.422 )
+shader_param/distortion_time_scale = 0.015
+shader_param/distortion_amplitude = 0.013
+shader_param/tile_factor = 0.671
+shader_param/water_time_scale = 0.05
+shader_param/reflection_intensity = 0.602
+shader_param/transform = Basis( 1, 0, 0, 0.279, 1.8, 0.55, 0, 0, 1 )
+shader_param/parallax_factor = 0.346
+shader_param/shore_color = Color( 0.0431373, 0.223529, 0.333333, 1 )
+shader_param/shore_size = 0.03
+shader_param/shore_smoothness = 0.017
+shader_param/shore_height_factor = 0.1
+shader_param/scale = Vector2( 7.901, 1.472 )
+shader_param/zoom_y = 0.529732
+shader_param/aspect_ratio = 1.0
+shader_param/transition_gradient = SubResource( 12 )
+shader_param/distortion_map = ExtResource( 6 )
+
+[node name="test" type="Node2D"]
 
 [node name="background" type="CanvasLayer" parent="."]
 layer = -1
@@ -106,9 +160,10 @@ margin_left = -394.0
 margin_top = -202.0
 margin_right = 1527.0
 margin_bottom = 942.0
-color = Color( 0.603922, 0.913725, 0.952941, 1 )
+color = Color( 0.94902, 0.976471, 0.980392, 1 )
 
 [node name="fadein" type="CanvasLayer" parent="."]
+layer = 2
 
 [node name="ColorRect2" type="ColorRect" parent="fadein"]
 visible = false
@@ -123,12 +178,30 @@ autoplay = "fadein"
 anims/RESET = SubResource( 7 )
 anims/fadein = SubResource( 8 )
 
+[node name="clouds" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="clouds" type="Sprite" parent="clouds"]
+material = SubResource( 14 )
+scale = Vector2( 1.27441, 1.50586 )
+texture = ExtResource( 11 )
+centered = false
+
+[node name="Light2D" type="Light2D" parent="."]
+position = Vector2( 485, -160 )
+scale = Vector2( 5.14844, 5.14844 )
+texture = ExtResource( 14 )
+texture_scale = 3.0
+color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
+energy = 1.68
+shadow_enabled = true
+shadow_gradient_length = 70.3
+shadow_filter = 2
+shadow_filter_smooth = 1.9
+
 [node name="spikes" type="Node2D" parent="."]
-position = Vector2( 855, 531 )
+position = Vector2( 853, 548 )
 scale = Vector2( 1.141, 0.82 )
-__meta__ = {
-"_edit_lock_": true
-}
 
 [node name="Sprite4" type="Sprite" parent="spikes"]
 position = Vector2( -110, -64 )
@@ -237,61 +310,47 @@ position = Vector2( 0.876587, -60.0919 )
 shape = SubResource( 6 )
 
 [node name="ground" type="StaticBody2D" parent="."]
-position = Vector2( 297, 389 )
+position = Vector2( 295, 406 )
 collision_layer = 3
-__meta__ = {
-"_edit_lock_": true
-}
 
 [node name="Sprite" type="Sprite" parent="ground"]
-position = Vector2( 107.345, -20.904 )
+position = Vector2( 193.345, 143.096 )
 texture = ExtResource( 1 )
-__meta__ = {
-"_edit_lock_": true
-}
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="ground"]
 position = Vector2( -1, 0 )
-polygon = PoolVector2Array( -249.847, 16.3842, -123, 20, -9.73445, 11.2994, 116.254, 7.90959, 229.249, 3.9548, 347.328, 20.339, 333.203, 81.3559, 344.503, 103.39, 431, 116, 543, 117, 546, 168, 365.407, 158.192, 316.254, 158.192, 241.678, 161.017, -257.757, 145.763, -335.723, 140.113, -326, -213, -244, -220 )
+polygon = PoolVector2Array( -229, 32, -123, 20, -9.73445, 11.2994, 116.254, 7.90959, 229.249, 3.9548, 347.328, 20.339, 333.203, 81.3559, 344.503, 103.39, 431, 116, 543, 117, 546, 168, 365.407, 158.192, 316.254, 158.192, 241.678, 161.017, -257.757, 145.763 )
 __meta__ = {
 "_edit_lock_": true
 }
 
 [node name="ground2" type="StaticBody2D" parent="."]
-position = Vector2( 1365, 391 )
+position = Vector2( 1363, 408 )
 scale = Vector2( -1, 1 )
 collision_layer = 3
-__meta__ = {
-"_edit_lock_": true
-}
 
 [node name="Sprite" type="Sprite" parent="ground2"]
-position = Vector2( 107.345, -20.904 )
+position = Vector2( 191.345, 141.096 )
 texture = ExtResource( 1 )
-__meta__ = {
-"_edit_lock_": true
-}
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="ground2"]
 position = Vector2( -1, 0 )
-polygon = PoolVector2Array( -249.847, 16.3842, -123, 20, -9.73445, 11.2994, 116.254, 7.90959, 229.249, 3.9548, 347.328, 20.339, 333.203, 81.3559, 344.503, 103.39, 384, 114, 524, 113, 524, 172, 365.407, 158.192, 316.254, 158.192, 241.678, 161.017, -257.757, 145.763, -335.723, 140.113, -328, -213, -245, -218 )
+polygon = PoolVector2Array( -238, 30, -123, 20, -9.73445, 11.2994, 116.254, 7.90959, 229.249, 3.9548, 347.328, 20.339, 333.203, 81.3559, 344.503, 103.39, 384, 114, 524, 113, 524, 172, 365.407, 158.192, 316.254, 158.192, 241.678, 161.017, -270, 144 )
 __meta__ = {
 "_edit_lock_": true
 }
 
 [node name="swing_point" parent="." instance=ExtResource( 5 )]
+position = Vector2( 841, 214 )
 
 [node name="swing_point2" parent="." instance=ExtResource( 5 )]
-position = Vector2( 307, 224 )
+position = Vector2( 305, 241 )
 
 [node name="swing_point3" parent="." instance=ExtResource( 5 )]
-position = Vector2( 1354, 202 )
+position = Vector2( 1352, 219 )
 
 [node name="froggie" parent="." instance=ExtResource( 2 )]
-position = Vector2( 364, 321 )
-__meta__ = {
-"_edit_lock_": true
-}
+position = Vector2( 362, 338 )
 
 [node name="cam" type="RemoteTransform2D" parent="froggie"]
 remote_path = NodePath("../../Camera2D")
@@ -305,39 +364,39 @@ remote_path = NodePath("../../swing_zone")
 update_rotation = false
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2( 364, 321 )
+position = Vector2( 362, 338 )
 current = true
-zoom = Vector2( 0.66, 0.66 )
+zoom = Vector2( 0.85, 0.85 )
 limit_left = 0
 limit_top = 0
-limit_right = 5000
-limit_bottom = 510
+limit_right = 1700
+limit_bottom = 720
 limit_smoothed = true
 smoothing_enabled = true
 smoothing_speed = 3.5
 
 [node name="tongue" type="Line2D" parent="."]
 visible = false
+light_mask = 0
 z_index = 1
 points = PoolVector2Array( 0, 0, 0, 50 )
 width_curve = SubResource( 2 )
-default_color = Color( 1, 0.545098, 0.545098, 1 )
+default_color = Color( 1, 0.717647, 0.717647, 1 )
+gradient = SubResource( 19 )
 joint_mode = 2
 begin_cap_mode = 2
 end_cap_mode = 2
+round_precision = 16
 antialiased = true
 __meta__ = {
 "_edit_lock_": true
 }
 
 [node name="frogcoin" parent="." instance=ExtResource( 3 )]
-position = Vector2( 553, 340 )
-__meta__ = {
-"_edit_lock_": true
-}
+position = Vector2( 551, 246 )
 
 [node name="groundrays" type="Node2D" parent="."]
-position = Vector2( 364, 321 )
+position = Vector2( 362, 338 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -368,13 +427,27 @@ enabled = true
 cast_to = Vector2( 18.257, 23.847 )
 
 [node name="swing_zone" type="Area2D" parent="."]
-position = Vector2( 364, 321 )
+position = Vector2( 362, 338 )
 collision_layer = 8
 collision_mask = 4
 script = SubResource( 9 )
+__meta__ = {
+"_edit_lock_": true
+}
 
 [node name="swing_col" type="CollisionShape2D" parent="swing_zone"]
 shape = SubResource( 10 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="water2" type="Sprite" parent="."]
+material = SubResource( 13 )
+position = Vector2( 860, 704 )
+scale = Vector2( 7.901, 1.472 )
+texture = ExtResource( 8 )
+normal_map = ExtResource( 7 )
+script = ExtResource( 10 )
 
 [connection signal="body_entered" from="swing_zone" to="swing_zone" method="_on_swing_zone_body_entered"]
 [connection signal="body_exited" from="swing_zone" to="swing_zone" method="_on_swing_zone_body_exited"]

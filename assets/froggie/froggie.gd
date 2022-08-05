@@ -31,7 +31,7 @@ func _ready():
 	set_process_input(true)
 
 func _input(event):
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 
 
 func groundrays_colliding():
