@@ -1,0 +1,89 @@
+[gd_scene load_steps=4 format=2]
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends RigidBody2D
+
+
+var new_transform = Transform2D()
+var should_reset = false
+
+func _integrate_forces(state):
+	if should_reset:
+		state.set_transform(new_transform)
+		should_reset = false
+
+func reset_to_position(t):
+	new_transform = t
+	should_reset = true
+"
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 23.56
+
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 20, 20 )
+
+[node name="swing_point" type="Node2D"]
+position = Vector2( 843, 197 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="swing" type="RigidBody2D" parent="."]
+visible = false
+position = Vector2( -1, 58 )
+collision_layer = 0
+collision_mask = 2
+custom_integrator = true
+can_sleep = false
+linear_damp = 0.5
+angular_damp = 0.5
+script = SubResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ColorRect" type="ColorRect" parent="swing"]
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+color = Color( 0, 0.439216, 1, 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="swing"]
+shape = SubResource( 4 )
+
+[node name="anchor" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 8
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ColorRect" type="ColorRect" parent="anchor"]
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+color = Color( 0, 0.439216, 1, 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="joint" type="DampedSpringJoint2D" parent="anchor"]
+node_a = NodePath("..")
+node_b = NodePath("../../swing")
+bias = 0.047
+length = 20.0
+rest_length = 10.0
+stiffness = 29.5
+damping = 0.13
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="col" type="CollisionShape2D" parent="anchor"]
+shape = SubResource( 5 )

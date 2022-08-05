@@ -1,0 +1,380 @@
+[gd_scene load_steps=13 format=2]
+
+[ext_resource path="res://assets/test/test.png" type="Texture" id=1]
+[ext_resource path="res://assets/froggie/froggie.tscn" type="PackedScene" id=2]
+[ext_resource path="res://assets/frogcoin/frogcoin.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/obstacles/spike1.png" type="Texture" id=4]
+[ext_resource path="res://assets/froggie/swing_point.tscn" type="PackedScene" id=5]
+
+[sub_resource type="Environment" id=1]
+background_color = Color( 0.592157, 0.894118, 0.87451, 1 )
+
+[sub_resource type="Animation" id=7]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("ColorRect2:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Color( 0, 0, 0, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("ColorRect2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ false ]
+}
+
+[sub_resource type="Animation" id=8]
+resource_name = "fadein"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("ColorRect2:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0, 0, 0, 1 ), Color( 0, 0, 0, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("ColorRect2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="RectangleShape2D" id=6]
+extents = Vector2( 201.578, 72.835 )
+
+[sub_resource type="Curve" id=2]
+min_value = 0.25
+max_value = 5.0
+_data = [ Vector2( 0, 0.25 ), 0.0, 6.3, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="GDScript" id=9]
+script/source = "extends Area2D
+
+onready var froggie = $\"../froggie\"
+
+func _on_swing_zone_body_entered(body):
+	if not froggie.swinging:
+		froggie.anchor = body
+		body.get_node(\"ColorRect\").color = Color(1,0,0,1)
+	else:
+		froggie.second_anchor = body
+		body.get_node(\"ColorRect\").color = Color(0,0,1,1)
+
+
+func _on_swing_zone_body_exited(body):
+	body.get_node(\"ColorRect\").color = Color(0,1,0,1)
+"
+
+[sub_resource type="CircleShape2D" id=10]
+radius = 300.0
+
+[node name="test" type="Node2D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 1 )
+
+[node name="background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="ColorRect" type="ColorRect" parent="background"]
+margin_left = -394.0
+margin_top = -202.0
+margin_right = 1527.0
+margin_bottom = 942.0
+color = Color( 0.603922, 0.913725, 0.952941, 1 )
+
+[node name="fadein" type="CanvasLayer" parent="."]
+
+[node name="ColorRect2" type="ColorRect" parent="fadein"]
+visible = false
+margin_left = -394.0
+margin_top = -202.0
+margin_right = 1527.0
+margin_bottom = 942.0
+color = Color( 0, 0, 0, 0 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="fadein"]
+autoplay = "fadein"
+anims/RESET = SubResource( 7 )
+anims/fadein = SubResource( 8 )
+
+[node name="spikes" type="Node2D" parent="."]
+position = Vector2( 855, 531 )
+scale = Vector2( 1.141, 0.82 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite4" type="Sprite" parent="spikes"]
+position = Vector2( -110, -64 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite" type="Sprite" parent="spikes"]
+position = Vector2( -158, -70 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite2" type="Sprite" parent="spikes"]
+position = Vector2( -158, -70 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite3" type="Sprite" parent="spikes"]
+position = Vector2( 52.0001, -8.00001 )
+scale = Vector2( -0.866374, 0.866374 )
+texture = ExtResource( 4 )
+offset = Vector2( 27.5321, -33.1128 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite5" type="Sprite" parent="spikes"]
+position = Vector2( -63, -62 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite6" type="Sprite" parent="spikes"]
+position = Vector2( -10, -56 )
+scale = Vector2( 0.857143, 0.857143 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite7" type="Sprite" parent="spikes"]
+position = Vector2( -92, -33 )
+scale = Vector2( 0.833333, 0.833333 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite12" type="Sprite" parent="spikes"]
+position = Vector2( -140, -32 )
+scale = Vector2( 0.833333, 0.833333 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite8" type="Sprite" parent="spikes"]
+position = Vector2( 91, -19 )
+rotation = 3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 4 )
+offset = Vector2( 27.5321, -33.1128 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite9" type="Sprite" parent="spikes"]
+position = Vector2( 166, -23 )
+rotation = 3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 4 )
+offset = Vector2( 27.5321, -33.1128 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite11" type="Sprite" parent="spikes"]
+position = Vector2( -38, -25 )
+scale = Vector2( 0.833333, 0.833333 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite10" type="Sprite" parent="spikes"]
+position = Vector2( 127, -9 )
+rotation = 3.14159
+scale = Vector2( 0.7862, -0.7862 )
+texture = ExtResource( 4 )
+offset = Vector2( 27.5321, -33.1128 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="killer" type="StaticBody2D" parent="spikes"]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="spikes/killer"]
+position = Vector2( 0.876587, -60.0919 )
+shape = SubResource( 6 )
+
+[node name="ground" type="StaticBody2D" parent="."]
+position = Vector2( 297, 389 )
+collision_layer = 3
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ground"]
+position = Vector2( 107.345, -20.904 )
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="ground"]
+position = Vector2( -1, 0 )
+polygon = PoolVector2Array( -249.847, 16.3842, -123, 20, -9.73445, 11.2994, 116.254, 7.90959, 229.249, 3.9548, 347.328, 20.339, 333.203, 81.3559, 344.503, 103.39, 431, 116, 543, 117, 546, 168, 365.407, 158.192, 316.254, 158.192, 241.678, 161.017, -257.757, 145.763, -335.723, 140.113, -326, -213, -244, -220 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ground2" type="StaticBody2D" parent="."]
+position = Vector2( 1365, 391 )
+scale = Vector2( -1, 1 )
+collision_layer = 3
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Sprite" type="Sprite" parent="ground2"]
+position = Vector2( 107.345, -20.904 )
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="ground2"]
+position = Vector2( -1, 0 )
+polygon = PoolVector2Array( -249.847, 16.3842, -123, 20, -9.73445, 11.2994, 116.254, 7.90959, 229.249, 3.9548, 347.328, 20.339, 333.203, 81.3559, 344.503, 103.39, 384, 114, 524, 113, 524, 172, 365.407, 158.192, 316.254, 158.192, 241.678, 161.017, -257.757, 145.763, -335.723, 140.113, -328, -213, -245, -218 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="swing_point" parent="." instance=ExtResource( 5 )]
+
+[node name="swing_point2" parent="." instance=ExtResource( 5 )]
+position = Vector2( 307, 224 )
+
+[node name="swing_point3" parent="." instance=ExtResource( 5 )]
+position = Vector2( 1354, 202 )
+
+[node name="froggie" parent="." instance=ExtResource( 2 )]
+position = Vector2( 364, 321 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="cam" type="RemoteTransform2D" parent="froggie"]
+remote_path = NodePath("../../Camera2D")
+
+[node name="groundrays" type="RemoteTransform2D" parent="froggie"]
+remote_path = NodePath("../../groundrays")
+update_rotation = false
+
+[node name="swing_zone" type="RemoteTransform2D" parent="froggie"]
+remote_path = NodePath("../../swing_zone")
+update_rotation = false
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 364, 321 )
+current = true
+zoom = Vector2( 0.66, 0.66 )
+limit_left = 0
+limit_top = 0
+limit_right = 5000
+limit_bottom = 510
+limit_smoothed = true
+smoothing_enabled = true
+smoothing_speed = 3.5
+
+[node name="tongue" type="Line2D" parent="."]
+visible = false
+z_index = 1
+points = PoolVector2Array( 0, 0, 0, 50 )
+width_curve = SubResource( 2 )
+default_color = Color( 1, 0.545098, 0.545098, 1 )
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+antialiased = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="frogcoin" parent="." instance=ExtResource( 3 )]
+position = Vector2( 553, 340 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="groundrays" type="Node2D" parent="."]
+position = Vector2( 364, 321 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="groundray1" type="RayCast2D" parent="groundrays"]
+position = Vector2( -0.320999, -2 )
+enabled = true
+cast_to = Vector2( -10, 28 )
+
+[node name="groundray2" type="RayCast2D" parent="groundrays"]
+position = Vector2( -0.320999, -2 )
+enabled = true
+cast_to = Vector2( 10, 28 )
+
+[node name="groundray3" type="RayCast2D" parent="groundrays"]
+position = Vector2( -0.320999, -2 )
+enabled = true
+cast_to = Vector2( 0, 29.5 )
+
+[node name="groundray4" type="RayCast2D" parent="groundrays"]
+position = Vector2( -0.320999, -2 )
+enabled = true
+cast_to = Vector2( -18.257, 23.847 )
+
+[node name="groundray5" type="RayCast2D" parent="groundrays"]
+position = Vector2( -0.320999, -2 )
+enabled = true
+cast_to = Vector2( 18.257, 23.847 )
+
+[node name="swing_zone" type="Area2D" parent="."]
+position = Vector2( 364, 321 )
+collision_layer = 8
+collision_mask = 4
+script = SubResource( 9 )
+
+[node name="swing_col" type="CollisionShape2D" parent="swing_zone"]
+shape = SubResource( 10 )
+
+[connection signal="body_entered" from="swing_zone" to="swing_zone" method="_on_swing_zone_body_entered"]
+[connection signal="body_exited" from="swing_zone" to="swing_zone" method="_on_swing_zone_body_exited"]
