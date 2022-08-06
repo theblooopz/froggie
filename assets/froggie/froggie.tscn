@@ -18,6 +18,16 @@
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
+"frames": [ ExtResource( 7 ) ],
+"loop": true,
+"name": "idle",
+"speed": 12.0
+}, {
+"frames": [ ExtResource( 15 ) ],
+"loop": true,
+"name": "air",
+"speed": 5.0
+}, {
 "frames": [ ExtResource( 10 ), ExtResource( 6 ), ExtResource( 12 ), ExtResource( 9 ), ExtResource( 5 ), ExtResource( 11 ), ExtResource( 8 ), ExtResource( 4 ), ExtResource( 2 ), ExtResource( 3 ), ExtResource( 1 ) ],
 "loop": true,
 "name": "dance",
@@ -27,16 +37,6 @@ animations = [ {
 "loop": true,
 "name": "run",
 "speed": 5.0
-}, {
-"frames": [ ExtResource( 15 ) ],
-"loop": true,
-"name": "air",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 7 ) ],
-"loop": true,
-"name": "idle",
-"speed": 12.0
 } ]
 
 [sub_resource type="CircleShape2D" id=4]
@@ -49,7 +49,8 @@ polygon = PoolVector2Array( 4, 11, -4, 11, -9, 14, -9, 19, -4, 21, 5, 21, 8, 18,
 collision_mask = 18
 mode = 2
 custom_integrator = true
-contacts_reported = 1
+continuous_cd = 1
+contacts_reported = 2
 contact_monitor = true
 can_sleep = false
 script = ExtResource( 13 )
@@ -78,7 +79,7 @@ wait_time = 0.5
 one_shot = true
 
 [node name="LightOccluder2D" type="LightOccluder2D" parent="."]
-position = Vector2( 1, 0 )
+position = Vector2( 0, -16 )
 occluder = SubResource( 5 )
 
 [connection signal="body_entered" from="." to="." method="_on_froggie_body_entered"]

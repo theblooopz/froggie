@@ -37,6 +37,7 @@ visible = false
 position = Vector2( -1, 58 )
 collision_layer = 0
 collision_mask = 2
+gravity_scale = 3.0
 custom_integrator = true
 can_sleep = false
 linear_damp = 0.5
@@ -60,7 +61,7 @@ __meta__ = {
 shape = SubResource( 4 )
 
 [node name="anchor" type="StaticBody2D" parent="."]
-collision_layer = 4
+collision_layer = 8
 collision_mask = 8
 __meta__ = {
 "_edit_lock_": true

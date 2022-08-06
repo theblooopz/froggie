@@ -17,6 +17,7 @@ onready var motion = Vector2.ZERO
 onready var swinging = false
 onready var tongue = $"../tongue"
 onready var groundrays = $"../groundrays"
+onready var tongue_ray = $"../tongue_ray"
 onready var tongue_end = Vector2.ZERO
 onready var tongue_begin = Vector2.ZERO
 onready var tongue_start = $tongue_start
@@ -27,16 +28,10 @@ onready var anchor = null
 onready var second_anchor = null
 onready var swing = null
 onready var joint = null
+onready var dancing = false
 
 var rolling = false
 var initial_swing = true
-
-func _ready():
-	set_process_input(true)
-
-func _input(event):
-	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-
 
 func groundrays_colliding():
 	for child in groundrays.get_children():
@@ -45,7 +40,14 @@ func groundrays_colliding():
 				return true
 	return false
 
+func groundrays_normals():
+	var nmls = []
+	for child in groundrays.get_children():
+		nmls.push_back(abs(rad2deg(child.get_collision_normal().angle())))
+	return nmls
+
 func _integrate_forces(state):
+		
 	
 	tongue.set_point_position(0, tongue_start.get_global_transform().get_origin())
 
@@ -96,25 +98,26 @@ func _integrate_forces(state):
 	
 	if groundrays_colliding() and motion.y > 0:
 		motion.y = 0
-		
-	
-	direction = float(Input.is_action_pressed("move_right")) \
-	- float(Input.is_action_pressed("move_left"))
-	
 	
 	if not groundrays_colliding():
 		motion.x = lerp(state.linear_velocity.x, _SPEED * direction, ACCELERATION)
 
+	
+	if anchor:
+		tongue_ray.set_cast_to(anchor.get_global_transform().get_origin() - get_position())
+	
+	
 	if Input.is_action_just_pressed("move_jump"):
 		if anchor:
 			var dist = tongue_begin.distance_to(anchor.get_global_transform().get_origin())
-			if dist < SWING_POINT_DISTANCE:
-				if $swing_cooldown.is_stopped():
-					swinging = true
-					$swing_cooldown.start()
+			if dist < SWING_POINT_DISTANCE and not tongue_ray.is_colliding():
+					if $swing_cooldown.is_stopped():
+						swinging = true
+						$swing_cooldown.start()
 			else:
 				if get_mode() == RigidBody2D.MODE_CHARACTER && groundrays_colliding():
 					motion.y = -JUMP_FORCE
+			
 		else:
 			if get_mode() == RigidBody2D.MODE_CHARACTER && groundrays_colliding():
 				motion.y = -JUMP_FORCE
@@ -146,10 +149,31 @@ func _integrate_forces(state):
 	if groundrays_colliding():
 		motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION)
 	
-	if not groundrays_colliding() and not swinging:
+	var nmls = groundrays_normals()
+	var nmlsa = []
+	for child in nmls:
+		nmlsa.push_back(abs(child))
+
+	if not groundrays_colliding():
 		motion.y += GRAVITY
+	else:
+		if nmls and not swinging:
+			if nmlsa.min() <= 0:
+				if nmlsa.min() != 0:
+					var idx = nmls.find(nmls.min())
+					motion.y += GRAVITY * sin(deg2rad(nmls[idx]))
+					motion.x += GRAVITY * cos(deg2rad(nmls[idx]))
+					rolling = true
 	
-	if not swinging:
+	if not groundrays_colliding() and not swinging:
+		motion.x = lerp(motion.x, _SPEED * $sprite.scale.x, ACCELERATION)
+		rolling = true
+		
+		
+	if direction:
+		dancing = false
+	
+	if not swinging and not dancing:
 		if direction:
 			
 			$sprite.scale.x = abs($sprite.scale.x)*sign(direction)
@@ -178,6 +202,14 @@ func _integrate_forces(state):
 				state.set_angular_velocity(0)
 				$sprite.animation = "idle"
 				call_deferred("set_mode", RigidBody2D.MODE_CHARACTER)
+				
+	
+	if Input.is_action_just_pressed("move_dance"):
+		if not abs(state.transform.get_rotation()) >= 0.1:
+			dancing = true
+			tongue.hide()
+			$sprite.animation = "dance"
+	
 	
 	if not groundrays_colliding():
 		$sprite.animation = "air"
@@ -187,9 +219,18 @@ func _integrate_forces(state):
 	
 	state.set_linear_velocity(motion)
 
+	
+	if anchor:
+		var dist = tongue_begin.distance_to(anchor.get_global_transform().get_origin())
+		if dist < SWING_POINT_DISTANCE:
+			anchor.get_node("ColorRect").color = Color(1,0,0,1)
+	
+
 func _on_froggie_body_entered(body):
 	if body.has_method("collected"):
 		body.collected()
+		
 	
 	if body.get_name() == "killer":
 		get_tree().change_scene("res://assets/test/test.tscn")
+
