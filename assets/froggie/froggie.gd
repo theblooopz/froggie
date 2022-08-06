@@ -1,13 +1,17 @@
 extends RigidBody2D
 
-const SPEED = 250
+const SPEED = 300
+const RUN_FACTOR = 1.5
 const GRAVITY = 10 * 3
 const JUMP_FORCE = 200 * 3
 const ACCELERATION = 0.8
 const SWING_POWER = 9
 const SWING_POINT_DISTANCE = 350
+const ROLL_SPEED = 15
 
 
+var _SPEED = SPEED
+var _ROLL_SPEED = ROLL_SPEED
 onready var motion = Vector2.ZERO
 
 onready var swinging = false
@@ -24,7 +28,7 @@ onready var second_anchor = null
 onready var swing = null
 onready var joint = null
 
-
+var rolling = false
 var initial_swing = true
 
 func _ready():
@@ -45,8 +49,20 @@ func _integrate_forces(state):
 	
 	tongue.set_point_position(0, tongue_start.get_global_transform().get_origin())
 
+	rolling = Input.is_action_pressed("move_roll")
+	
+	if Input.is_action_pressed("move_run"):
+		_SPEED = SPEED*RUN_FACTOR
+		_ROLL_SPEED = ROLL_SPEED*RUN_FACTOR
+		$sprite.speed_scale = 2 + RUN_FACTOR
+	else:
+		_SPEED = SPEED
+		_ROLL_SPEED = ROLL_SPEED
+		$sprite.speed_scale = 2
 	
 	if swinging:
+		
+		rolling = false
 		
 		if initial_swing and anchor:
 			joint = anchor.get_node("joint")
@@ -87,7 +103,7 @@ func _integrate_forces(state):
 	
 	
 	if not groundrays_colliding():
-		motion.x = lerp(state.linear_velocity.x, SPEED * direction, ACCELERATION)
+		motion.x = lerp(state.linear_velocity.x, _SPEED * direction, ACCELERATION)
 
 	if Input.is_action_just_pressed("move_jump"):
 		if anchor:
@@ -128,32 +144,40 @@ func _integrate_forces(state):
 	if motion.y < 0: direction = 0
 
 	if groundrays_colliding():
-		motion.x = lerp(motion.x, SPEED * direction, ACCELERATION)
+		motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION)
 	
 	if not groundrays_colliding() and not swinging:
 		motion.y += GRAVITY
 	
-	
-	if Input.is_action_just_pressed("move_dance") and not swinging and\
-	abs(state.transform.get_rotation()) < 0.1:
-		tongue.hide()
-		$sprite.animation = "dance"
-		motion.x = 0
-	
-	if abs(floor(motion.x)) > 0:
-		$sprite.scale.x = abs($sprite.scale.x)*sign(motion.x)
-		$sprite.animation = "run"
-	
-		
-	if direction:
-		if abs(state.transform.get_rotation()) >= 0.1:
-			state.set_angular_velocity(10 * direction)
+	if not swinging:
+		if direction:
+			
+			$sprite.scale.x = abs($sprite.scale.x)*sign(direction)
+			$sprite.animation = "run"
+			
+			if rolling:
+				state.set_angular_velocity(_ROLL_SPEED * direction)
+			elif abs(state.transform.get_rotation()) >= 0.1:
+				state.set_angular_velocity(_ROLL_SPEED * direction)
+			else:
+				state.set_angular_velocity(0)
+				$sprite.animation = "run"
+				call_deferred("set_mode", RigidBody2D.MODE_CHARACTER)
 		else:
-			state.set_angular_velocity(0)
-			call_deferred("set_mode", RigidBody2D.MODE_CHARACTER)
-	else:
-		if $sprite.animation != "dance":
-			$sprite.animation = "idle"
+			if rolling:
+				state.set_angular_velocity(0)
+				$sprite.animation = "idle"
+				if abs(state.transform.get_rotation()) >= 0.1:
+					$sprite.animation = "air"
+				else:
+					$sprite.animation = "idle"
+			elif abs(state.transform.get_rotation()) >= 0.1:
+				state.set_angular_velocity(_ROLL_SPEED * direction)
+				$sprite.animation = "air"
+			else:
+				state.set_angular_velocity(0)
+				$sprite.animation = "idle"
+				call_deferred("set_mode", RigidBody2D.MODE_CHARACTER)
 	
 	if not groundrays_colliding():
 		$sprite.animation = "air"
