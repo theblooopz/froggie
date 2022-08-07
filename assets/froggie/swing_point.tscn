@@ -99,5 +99,5 @@ occluder = SubResource( 6 )
 
 [node name="swish" type="AudioStreamPlayer" parent="anchor"]
 stream = ExtResource( 1 )
-volume_db = -40.0
+volume_db = 5.0
 bus = "SFX"
