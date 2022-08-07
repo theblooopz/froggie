@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://assets/test/test.png" type="Texture" id=1]
 [ext_resource path="res://assets/froggie/player.tscn" type="PackedScene" id=2]
@@ -92,6 +92,13 @@ shader_param/tile_factor2 = 0.884
 shader_param/noise_texture2 = ExtResource( 13 )
 shader_param/gradient_texture = SubResource( 16 )
 
+[sub_resource type="StyleBoxFlat" id=23]
+bg_color = Color( 0, 0, 0, 0.658824 )
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [sub_resource type="RectangleShape2D" id=6]
 extents = Vector2( 201.578, 72.835 )
 
@@ -121,7 +128,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 13.4375, 1.472 )
-shader_param/zoom_y = 0.749154
+shader_param/zoom_y = 1.0
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -141,6 +148,7 @@ extents = Vector2( 1042, 833 )
 
 [node name="ambience" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 17 )
+volume_db = -30.0
 autoplay = true
 bus = "SFX"
 
@@ -182,35 +190,45 @@ centered = false
 [node name="HUD" type="CanvasLayer" parent="."]
 layer = 3
 
-[node name="RichTextLabel" type="RichTextLabel" parent="HUD"]
-margin_left = 17.0
-margin_top = 537.0
-margin_right = 423.0
-margin_bottom = 702.0
+[node name="panel" type="Panel" parent="HUD"]
+anchor_left = 0.03
+anchor_right = 0.042
+margin_left = -28.4
+margin_top = 10.0
+margin_right = 287.24
+margin_bottom = 227.0
+custom_styles/panel = SubResource( 23 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="HUD/panel"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 324.0
+margin_bottom = 205.0
 size_flags_horizontal = 3
 custom_colors/default_color = Color( 1, 1, 1, 1 )
-custom_colors/font_color_shadow = Color( 0, 0, 0, 0.47451 )
 bbcode_enabled = true
-bbcode_text = "[color=green][b]Instructions[/b][/color]
+bbcode_text = "[color=yellow]INSTRUCTIONS[/color]
 
 Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
 
 Press T: Hide this display
 Hold A,D = run left, run right
-Hold Shift = sprint
+Hold Shift = increase speed
 Hold W = tongue grapple/jump
 Hold S = roll
-press Q = dance"
-text = "Instructions
+press Q = dance
+Press R = restart"
+text = "INSTRUCTIONS
 
 Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
 
 Press T: Hide this display
 Hold A,D = run left, run right
-Hold Shift = sprint
+Hold Shift = increase speed
 Hold W = tongue grapple/jump
 Hold S = roll
-press Q = dance"
+press Q = dance
+Press R = restart"
 fit_content_height = true
 scroll_active = false
 
@@ -421,10 +439,10 @@ position = Vector2( 841, 214 )
 position = Vector2( 1444, 226 )
 
 [node name="player" parent="." instance=ExtResource( 2 )]
-position = Vector2( 440, 372 )
+position = Vector2( 452, 426 )
 
 [node name="frogcoin" parent="." instance=ExtResource( 3 )]
-position = Vector2( 531, 415 )
+position = Vector2( 255, 290 )
 
 [node name="butterfly" parent="." instance=ExtResource( 15 )]
 position = Vector2( 832, 426 )
