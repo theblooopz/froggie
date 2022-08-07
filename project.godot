@@ -14,6 +14,10 @@ config/name="Froggie"
 run/main_scene="res://assets/test/test.tscn"
 config/icon="res://icon.png"
 
+[audio]
+
+driver=""
+
 [autoload]
 
 global="*res://assets/scripts/global.gd"
