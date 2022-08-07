@@ -1,6 +1,6 @@
 extends Node
 
-onready var HUD = get_node("/root/test/HUD")
+onready var HUD_visible = true
 
 func _onready():
 	set_process_input(true)
@@ -17,4 +17,6 @@ func _input(event):
 		OS.window_fullscreen = not OS.window_fullscreen
 
 	if event.is_action_pressed("global_help"):
+		var HUD = get_node("/root/test/HUD")
 		HUD.visible = not HUD.visible
+		HUD_visible = HUD.visible

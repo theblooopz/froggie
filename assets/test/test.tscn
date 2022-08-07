@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://assets/test/test.png" type="Texture" id=1]
 [ext_resource path="res://assets/froggie/player.tscn" type="PackedScene" id=2]
@@ -17,6 +17,17 @@
 [ext_resource path="res://assets/environment/butterfly.tscn" type="PackedScene" id=15]
 [ext_resource path="res://assets/environment/bird.tscn" type="PackedScene" id=16]
 [ext_resource path="res://assets/audio/forest_ambience.wav" type="AudioStream" id=17]
+
+[sub_resource type="GDScript" id=21]
+script/source = "extends Area2D
+
+func _on_playarea_body_exited(body):
+	if body.get_name() == \"froggie\":
+		get_tree().change_scene(\"res://assets/test/test.tscn\")
+"
+
+[sub_resource type="RectangleShape2D" id=20]
+extents = Vector2( 1319, 969 )
 
 [sub_resource type="Animation" id=7]
 length = 0.001
@@ -92,6 +103,13 @@ shader_param/tile_factor2 = 0.884
 shader_param/noise_texture2 = ExtResource( 13 )
 shader_param/gradient_texture = SubResource( 16 )
 
+[sub_resource type="GDScript" id=24]
+script/source = "extends CanvasLayer
+
+func _ready():
+	self.visible = global.HUD_visible
+"
+
 [sub_resource type="StyleBoxFlat" id=23]
 bg_color = Color( 0, 0, 0, 0.658824 )
 corner_radius_top_left = 10
@@ -128,21 +146,10 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 13.4375, 1.472 )
-shader_param/zoom_y = 1.0
+shader_param/zoom_y = 0.471937
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
-
-[sub_resource type="GDScript" id=21]
-script/source = "extends Area2D
-
-func _on_playarea_body_exited(body):
-	if body.get_name() == \"froggie\":
-		get_tree().change_scene(\"res://assets/test/test.tscn\")
-"
-
-[sub_resource type="RectangleShape2D" id=20]
-extents = Vector2( 1042, 833 )
 
 [node name="test" type="Node2D"]
 
@@ -151,6 +158,31 @@ stream = ExtResource( 17 )
 volume_db = -30.0
 autoplay = true
 bus = "SFX"
+
+[node name="camera" type="Camera2D" parent="."]
+current = true
+zoom = Vector2( 1.2, 1.2 )
+limit_left = -500
+limit_top = -500
+limit_right = 2300
+limit_bottom = 750
+limit_smoothed = true
+smoothing_enabled = true
+smoothing_speed = 3.5
+
+[node name="playarea" type="Area2D" parent="."]
+collision_layer = 0
+script = SubResource( 21 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="collision" type="CollisionShape2D" parent="playarea"]
+position = Vector2( 902, 52 )
+shape = SubResource( 20 )
+__meta__ = {
+"_edit_lock_": true
+}
 
 [node name="background" type="CanvasLayer" parent="."]
 layer = -1
@@ -189,6 +221,7 @@ centered = false
 
 [node name="HUD" type="CanvasLayer" parent="."]
 layer = 3
+script = SubResource( 24 )
 
 [node name="panel" type="Panel" parent="HUD"]
 anchor_left = 0.03
@@ -438,8 +471,15 @@ position = Vector2( 841, 214 )
 [node name="swing_point3" parent="." instance=ExtResource( 5 )]
 position = Vector2( 1444, 226 )
 
+[node name="swing_point4" parent="." instance=ExtResource( 5 )]
+position = Vector2( 1774, 92 )
+
+[node name="swing_point5" parent="." instance=ExtResource( 5 )]
+position = Vector2( 1114, -44 )
+
 [node name="player" parent="." instance=ExtResource( 2 )]
 position = Vector2( 452, 426 )
+camera = NodePath("../camera")
 
 [node name="frogcoin" parent="." instance=ExtResource( 3 )]
 position = Vector2( 255, 290 )
@@ -465,19 +505,5 @@ scale = Vector2( 13.4375, 1.472 )
 texture = ExtResource( 8 )
 normal_map = ExtResource( 7 )
 script = ExtResource( 10 )
-
-[node name="playarea" type="Area2D" parent="."]
-collision_layer = 0
-script = SubResource( 21 )
-__meta__ = {
-"_edit_lock_": true
-}
-
-[node name="collision" type="CollisionShape2D" parent="playarea"]
-position = Vector2( 833, 178 )
-shape = SubResource( 20 )
-__meta__ = {
-"_edit_lock_": true
-}
 
 [connection signal="body_exited" from="playarea" to="playarea" method="_on_playarea_body_exited"]

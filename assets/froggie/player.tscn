@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://assets/froggie/froggie.gd" type="Script" id=1]
 [ext_resource path="res://assets/froggie/froggieSprite0007.png" type="Texture" id=2]
@@ -15,6 +15,17 @@
 [ext_resource path="res://assets/froggie/froggieSprite0005.png" type="Texture" id=13]
 [ext_resource path="res://assets/froggie/froggieSprite0002.png" type="Texture" id=14]
 [ext_resource path="res://assets/froggie/froggieSprite0013.png" type="Texture" id=15]
+
+[sub_resource type="GDScript" id=24]
+script/source = "extends Node2D
+
+export(NodePath) var camera
+
+onready var cam = $\"froggie/cam\"
+
+func _ready():
+	cam.set_remote_node(get_node(camera).get_path())
+"
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -81,6 +92,7 @@ offsets = PoolRealArray( 0.10757, 1 )
 colors = PoolColorArray( 0.930176, 0.563192, 0.563192, 1, 0.937988, 0.494642, 0.494642, 1 )
 
 [node name="player" type="Node2D"]
+script = SubResource( 24 )
 
 [node name="froggie" type="RigidBody2D" parent="." groups=["PLAYER"]]
 collision_mask = 2
@@ -128,7 +140,6 @@ wait_time = 0.2
 one_shot = true
 
 [node name="cam" type="RemoteTransform2D" parent="froggie"]
-remote_path = NodePath("../../Camera2D")
 
 [node name="groundray" type="RemoteTransform2D" parent="froggie"]
 remote_path = NodePath("../../groundray")
@@ -157,17 +168,6 @@ collision_mask = 2
 enabled = true
 cast_to = Vector2( 0, 30 )
 collision_mask = 2
-
-[node name="Camera2D" type="Camera2D" parent="."]
-current = true
-zoom = Vector2( 1.2, 1.2 )
-limit_left = 0
-limit_top = -500
-limit_right = 1700
-limit_bottom = 720
-limit_smoothed = true
-smoothing_enabled = true
-smoothing_speed = 3.5
 
 [node name="tongue" type="Line2D" parent="."]
 visible = false
