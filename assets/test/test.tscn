@@ -141,7 +141,6 @@ extents = Vector2( 1042, 833 )
 
 [node name="ambience" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 17 )
-volume_db = -10.0
 autoplay = true
 bus = "SFX"
 

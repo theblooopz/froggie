@@ -14,10 +14,6 @@ config/name="Froggie"
 run/main_scene="res://assets/test/test.tscn"
 config/icon="res://icon.png"
 
-[audio]
-
-driver=""
-
 [autoload]
 
 global="*res://assets/scripts/global.gd"
@@ -104,4 +100,5 @@ common/enable_pause_aware_picking=true
 quality/driver/driver_name="GLES2"
 vram_compression/import_etc=true
 vram_compression/import_etc2=false
+quality/filters/use_nearest_mipmap_filter=true
 environment/default_environment="res://default_env.tres"

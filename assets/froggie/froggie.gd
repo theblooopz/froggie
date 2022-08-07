@@ -92,6 +92,7 @@ func _integrate_forces(state):
 	
 	
 	if not swinging:
+		anchor = null
 		for child in anchors:
 			
 			tongue_ray.set_cast_to(child.get_global_transform().get_origin() - get_global_transform().origin)
@@ -100,8 +101,6 @@ func _integrate_forces(state):
 			if dist < SWING_POINT_DISTANCE and not tongue_ray.is_colliding():
 				anchor = child
 				break
-			else:
-				anchor = null
 
 
 	if Input.is_action_just_pressed("move_jump"):
