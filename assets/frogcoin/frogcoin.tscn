@@ -60,7 +60,7 @@ occluder = SubResource( 6 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 scale = Vector2( 0.25, 0.25 )
 frames = SubResource( 1 )
-frame = 10
+frame = 19
 speed_scale = 0.66
 playing = true
 __meta__ = {

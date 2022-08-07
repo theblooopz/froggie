@@ -113,19 +113,21 @@ onready var froggie = $\"../froggie\"
 
 func _on_swing_zone_body_entered(body):
 	if not froggie.swinging:
-		froggie.anchor = body
+		froggie.anchors.push_back(body)
 		#body.get_node(\"ColorRect\").color = Color(1,0,0,1)
 	else:
 		froggie.second_anchor = body
+		froggie.anchors.push_back(body)
 		#body.get_node(\"ColorRect\").color = Color(0,0,1,1)
 
-
 func _on_swing_zone_body_exited(body):
+	if body in froggie.anchors:
+		froggie.anchors.remove(froggie.anchors.find(body))
 	body.get_node(\"ColorRect\").color = Color(\"0070ff\")
 "
 
-[sub_resource type="CircleShape2D" id=10]
-radius = 300.0
+[sub_resource type="RectangleShape2D" id=23]
+extents = Vector2( 300, 300 )
 
 [sub_resource type="Gradient" id=11]
 offsets = PoolRealArray( 0.502164, 1 )
@@ -150,7 +152,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 7.901, 1.472 )
-shader_param/zoom_y = 8.0
+shader_param/zoom_y = 0.561231
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -367,6 +369,7 @@ __meta__ = {
 }
 
 [node name="killer" type="StaticBody2D" parent="spikes"]
+position = Vector2( -1.75287, 31.7073 )
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="spikes/killer"]
@@ -445,14 +448,18 @@ position = Vector2( 305, 241 )
 position = Vector2( 1352, 219 )
 
 [node name="froggie" parent="." instance=ExtResource( 2 )]
-position = Vector2( 362, 338 )
+position = Vector2( 149, 275 )
 collision_mask = 2
 
 [node name="cam" type="RemoteTransform2D" parent="froggie"]
 remote_path = NodePath("../../Camera2D")
 
-[node name="groundrays" type="RemoteTransform2D" parent="froggie"]
-remote_path = NodePath("../../groundrays")
+[node name="groundray" type="RemoteTransform2D" parent="froggie"]
+remote_path = NodePath("../../groundray")
+update_rotation = false
+
+[node name="frontray" type="RemoteTransform2D" parent="froggie"]
+remote_path = NodePath("../../frontray")
 update_rotation = false
 
 [node name="swing_zone" type="RemoteTransform2D" parent="froggie"]
@@ -465,7 +472,7 @@ remote_path = NodePath("../../tongue_ray")
 update_rotation = false
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2( 362, 338 )
+position = Vector2( 149, 275 )
 current = true
 zoom = Vector2( 0.85, 0.85 )
 limit_left = 0
@@ -493,7 +500,7 @@ __meta__ = {
 }
 
 [node name="tongue_ray" type="RayCast2D" parent="."]
-position = Vector2( 362, 325.598 )
+position = Vector2( 149, 262.598 )
 enabled = true
 collision_mask = 2
 
@@ -514,40 +521,20 @@ position = Vector2( 510, 359 )
 rotation = 3.70234
 scale = Vector2( -0.75, 0.75 )
 
-[node name="groundrays" type="Node2D" parent="."]
-position = Vector2( 362, 338 )
-__meta__ = {
-"_edit_lock_": true
-}
-
-[node name="groundray1" type="RayCast2D" parent="groundrays"]
-position = Vector2( -0.320999, -2 )
-cast_to = Vector2( -10, 28 )
-collision_mask = 2
-
-[node name="groundray2" type="RayCast2D" parent="groundrays"]
-position = Vector2( -0.320999, -2 )
-cast_to = Vector2( 10, 28 )
-collision_mask = 2
-
-[node name="groundray3" type="RayCast2D" parent="groundrays"]
-position = Vector2( -0.320999, -2 )
+[node name="groundray" type="RayCast2D" parent="."]
+position = Vector2( 149, 275 )
 enabled = true
-cast_to = Vector2( 0, 29.528 )
+cast_to = Vector2( 0, 30 )
 collision_mask = 2
 
-[node name="groundray4" type="RayCast2D" parent="groundrays"]
-position = Vector2( -0.320999, -2 )
-cast_to = Vector2( -18.257, 23.847 )
-collision_mask = 2
-
-[node name="groundray5" type="RayCast2D" parent="groundrays"]
-position = Vector2( -0.320999, -2 )
-cast_to = Vector2( 18.257, 23.847 )
+[node name="frontray" type="RayCast2D" parent="."]
+position = Vector2( 149, 275 )
+enabled = true
+cast_to = Vector2( 45, 0 )
 collision_mask = 2
 
 [node name="swing_zone" type="Area2D" parent="."]
-position = Vector2( 362, 338 )
+position = Vector2( 149, 275 )
 collision_layer = 8
 collision_mask = 4
 script = SubResource( 9 )
@@ -556,7 +543,7 @@ __meta__ = {
 }
 
 [node name="swing_col" type="CollisionShape2D" parent="swing_zone"]
-shape = SubResource( 10 )
+shape = SubResource( 23 )
 __meta__ = {
 "_edit_lock_": true
 }
