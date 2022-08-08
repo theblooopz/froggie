@@ -40,7 +40,6 @@ position = Vector2( -1, 58 )
 collision_layer = 0
 collision_mask = 2
 gravity_scale = 3.0
-custom_integrator = true
 can_sleep = false
 linear_damp = 0.01
 angular_damp = 0.5
@@ -83,10 +82,10 @@ __meta__ = {
 node_a = NodePath("..")
 node_b = NodePath("../../swing")
 bias = 0.047
-length = 20.0
-rest_length = 15.0
-stiffness = 29.5
-damping = 0.13
+length = 80.0
+rest_length = 40.0
+stiffness = 21.2
+damping = 0.22
 __meta__ = {
 "_edit_lock_": true
 }

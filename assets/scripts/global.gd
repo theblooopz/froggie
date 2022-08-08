@@ -7,6 +7,8 @@ func _onready():
 
 func _input(event):
 	
+	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+	
 	if event.is_action_pressed("global_restart"):
 		get_tree().change_scene("assets/test/test.tscn")
 

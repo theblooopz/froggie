@@ -2,7 +2,6 @@
 tool
 extends Sprite
 
-
 func _ready() -> void:
 	connect("item_rect_changed", self, "update_scale")
 	connect("texture_changed", self, "update_aspect_ratio")
@@ -29,3 +28,5 @@ func update_zoom() -> void:
 func update_aspect_ratio() -> void:
 	var size: Vector2 = texture.get_size()
 	material.set_shader_param("aspect_ratio", size.x / size.y)
+
+

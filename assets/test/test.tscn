@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=2]
+[gd_scene load_steps=37 format=2]
 
 [ext_resource path="res://assets/test/test.png" type="Texture" id=1]
 [ext_resource path="res://assets/froggie/player.tscn" type="PackedScene" id=2]
@@ -17,13 +17,16 @@
 [ext_resource path="res://assets/environment/butterfly.tscn" type="PackedScene" id=15]
 [ext_resource path="res://assets/environment/bird.tscn" type="PackedScene" id=16]
 [ext_resource path="res://assets/audio/forest_ambience.wav" type="AudioStream" id=17]
+[ext_resource path="res://assets/scripts/wind.shader" type="Shader" id=18]
+[ext_resource path="res://assets/test/grass.png" type="Texture" id=19]
 
 [sub_resource type="GDScript" id=21]
 script/source = "extends Area2D
 
 func _on_playarea_body_exited(body):
-	if body.get_name() == \"froggie\":
-		get_tree().change_scene(\"res://assets/test/test.tscn\")
+	if body.is_in_group(\"PLAYER\"):
+		if body.has_method(\"on_death\"):
+			body.on_death()
 "
 
 [sub_resource type="RectangleShape2D" id=20]
@@ -94,9 +97,9 @@ gradient = SubResource( 15 )
 [sub_resource type="ShaderMaterial" id=14]
 shader = ExtResource( 12 )
 shader_param/tint = Color( 0.443137, 0.811765, 0.894118, 1 )
-shader_param/scroll_direction1 = Vector2( 0.7, -0.7 )
+shader_param/scroll_direction1 = Vector2( 0.8, 0 )
 shader_param/time_scale1 = 0.005
-shader_param/tile_factor1 = 0.886
+shader_param/tile_factor1 = 0.703
 shader_param/scroll_direction2 = Vector2( 0.75, 0 )
 shader_param/time_scale2 = 0.005
 shader_param/tile_factor2 = 0.884
@@ -123,6 +126,17 @@ extents = Vector2( 201.578, 72.835 )
 [sub_resource type="OccluderPolygon2D" id=22]
 polygon = PoolVector2Array( -15, 64, -27, 179, 143, 180 )
 
+[sub_resource type="ShaderMaterial" id=25]
+shader = ExtResource( 18 )
+shader_param/speed = 2.552
+shader_param/minStrength = 0.029
+shader_param/maxStrength = 0.155
+shader_param/strengthScale = 100.0
+shader_param/interval = 3.008
+shader_param/detail = 1.0
+shader_param/distortion = 0.165
+shader_param/heightOffset = 0.0
+
 [sub_resource type="Gradient" id=11]
 offsets = PoolRealArray( 0.502164, 1 )
 
@@ -146,10 +160,26 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 13.4375, 1.472 )
-shader_param/zoom_y = 0.471937
+shader_param/zoom_y = 0.793701
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
+
+[sub_resource type="GDScript" id=27]
+script/source = "extends Area2D
+
+onready var splash = preload(\"res://assets/environment/splash.tscn\")
+
+func _on_water_area_body_entered(body):
+	if body.is_in_group(\"PLAYER\"):
+		var si = splash.instance()
+		si.set_position(body.get_global_transform().origin + Vector2(0,10))
+		get_parent().get_parent().add_child(si)
+		si.get_node(\"AnimationPlayer\").play(\"splash\")
+"
+
+[sub_resource type="RectangleShape2D" id=26]
+extents = Vector2( 128.819, 118.206 )
 
 [node name="test" type="Node2D"]
 
@@ -169,6 +199,9 @@ limit_bottom = 750
 limit_smoothed = true
 smoothing_enabled = true
 smoothing_speed = 3.5
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color( 0.780392, 1, 0.972549, 1 )
 
 [node name="playarea" type="Area2D" parent="."]
 collision_layer = 0
@@ -229,14 +262,14 @@ anchor_right = 0.042
 margin_left = -28.4
 margin_top = 10.0
 margin_right = 287.24
-margin_bottom = 227.0
+margin_bottom = 238.0
 custom_styles/panel = SubResource( 23 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="HUD/panel"]
 margin_left = 10.0
 margin_top = 10.0
-margin_right = 324.0
-margin_bottom = 205.0
+margin_right = 323.0
+margin_bottom = 220.0
 size_flags_horizontal = 3
 custom_colors/default_color = Color( 1, 1, 1, 1 )
 bbcode_enabled = true
@@ -244,24 +277,26 @@ bbcode_text = "[color=yellow]INSTRUCTIONS[/color]
 
 Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
 
-Press T: Hide this display
+Press T: toggle this display
 Hold A,D = run left, run right
 Hold Shift = increase speed
 Hold W = tongue grapple/jump
 Hold S = roll
 press Q = dance
-Press R = restart"
+Press R = restart
+Press Ctrl+Enter = toggle fullscreen"
 text = "INSTRUCTIONS
 
 Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
 
-Press T: Hide this display
+Press T: toggle this display
 Hold A,D = run left, run right
 Hold Shift = increase speed
 Hold W = tongue grapple/jump
 Hold S = roll
 press Q = dance
-Press R = restart"
+Press R = restart
+Press Ctrl+Enter = toggle fullscreen"
 fit_content_height = true
 scroll_active = false
 
@@ -475,11 +510,129 @@ position = Vector2( 1444, 226 )
 position = Vector2( 1774, 92 )
 
 [node name="swing_point5" parent="." instance=ExtResource( 5 )]
-position = Vector2( 1114, -44 )
+position = Vector2( 434, 115 )
 
 [node name="player" parent="." instance=ExtResource( 2 )]
 position = Vector2( 452, 426 )
 camera = NodePath("../camera")
+
+[node name="grass" type="Node2D" parent="."]
+modulate = Color( 0.643137, 0.694118, 0.541176, 1 )
+position = Vector2( 385, 476 )
+scale = Vector2( 1.094, 0.342 )
+
+[node name="Grass2" type="Sprite" parent="grass"]
+material = SubResource( 25 )
+position = Vector2( 107.05, 28.6743 )
+rotation = 0.0767065
+texture = ExtResource( 19 )
+
+[node name="Grass7" type="Sprite" parent="grass"]
+material = SubResource( 25 )
+position = Vector2( 38.5447, 14.5853 )
+rotation = 0.0767065
+texture = ExtResource( 19 )
+
+[node name="Grass8" type="Sprite" parent="grass"]
+material = SubResource( 25 )
+position = Vector2( -43.0809, 11.4927 )
+rotation = -0.0575988
+texture = ExtResource( 19 )
+
+[node name="Grass9" type="Sprite" parent="grass"]
+material = SubResource( 25 )
+position = Vector2( -143.036, 19.9483 )
+rotation = -0.124643
+texture = ExtResource( 19 )
+
+[node name="Grass4" type="Sprite" parent="grass"]
+material = SubResource( 25 )
+position = Vector2( -60.2067, 21.1535 )
+rotation = -0.00120106
+texture = ExtResource( 19 )
+
+[node name="Grass3" type="Sprite" parent="grass"]
+material = SubResource( 25 )
+position = Vector2( 17.2663, 21.42 )
+rotation = -0.0486281
+texture = ExtResource( 19 )
+
+[node name="Grass5" type="Sprite" parent="grass"]
+material = SubResource( 25 )
+position = Vector2( -161.345, 29.4428 )
+rotation = -0.0486281
+texture = ExtResource( 19 )
+
+[node name="Grass6" type="Sprite" parent="grass"]
+material = SubResource( 25 )
+position = Vector2( -83.8409, 26.2184 )
+rotation = -0.0486281
+texture = ExtResource( 19 )
+
+[node name="Grass" type="Sprite" parent="grass"]
+material = SubResource( 25 )
+position = Vector2( 84.6145, 34.1711 )
+rotation = 0.102822
+texture = ExtResource( 19 )
+
+[node name="grass2" type="Node2D" parent="."]
+modulate = Color( 0.643137, 0.694118, 0.541176, 1 )
+position = Vector2( 1361, 467 )
+scale = Vector2( 0.822984, 0.391419 )
+
+[node name="Grass2" type="Sprite" parent="grass2"]
+material = SubResource( 25 )
+position = Vector2( 107.05, 28.6743 )
+rotation = 0.0767065
+texture = ExtResource( 19 )
+
+[node name="Grass7" type="Sprite" parent="grass2"]
+material = SubResource( 25 )
+position = Vector2( 38.5447, 14.5853 )
+rotation = 0.0767065
+texture = ExtResource( 19 )
+
+[node name="Grass8" type="Sprite" parent="grass2"]
+material = SubResource( 25 )
+position = Vector2( -43.0809, 11.4927 )
+rotation = -0.0575988
+texture = ExtResource( 19 )
+
+[node name="Grass9" type="Sprite" parent="grass2"]
+material = SubResource( 25 )
+position = Vector2( -143.036, 19.9483 )
+rotation = -0.124643
+texture = ExtResource( 19 )
+
+[node name="Grass4" type="Sprite" parent="grass2"]
+material = SubResource( 25 )
+position = Vector2( -60.2067, 21.1535 )
+rotation = -0.00120106
+texture = ExtResource( 19 )
+
+[node name="Grass3" type="Sprite" parent="grass2"]
+material = SubResource( 25 )
+position = Vector2( 17.2663, 21.42 )
+rotation = -0.0486281
+texture = ExtResource( 19 )
+
+[node name="Grass5" type="Sprite" parent="grass2"]
+material = SubResource( 25 )
+position = Vector2( -161.345, 29.4428 )
+rotation = -0.0486281
+texture = ExtResource( 19 )
+
+[node name="Grass6" type="Sprite" parent="grass2"]
+material = SubResource( 25 )
+position = Vector2( -83.8409, 26.2184 )
+rotation = -0.0486281
+texture = ExtResource( 19 )
+
+[node name="Grass" type="Sprite" parent="grass2"]
+material = SubResource( 25 )
+position = Vector2( 84.6145, 34.1711 )
+rotation = 0.102822
+texture = ExtResource( 19 )
 
 [node name="frogcoin" parent="." instance=ExtResource( 3 )]
 position = Vector2( 255, 290 )
@@ -500,10 +653,20 @@ scale = Vector2( -0.75, 0.75 )
 
 [node name="water2" type="Sprite" parent="."]
 material = SubResource( 13 )
-position = Vector2( 949, 778 )
+position = Vector2( -980, 596 )
 scale = Vector2( 13.4375, 1.472 )
 texture = ExtResource( 8 )
 normal_map = ExtResource( 7 )
+centered = false
 script = ExtResource( 10 )
 
+[node name="water_area" type="Area2D" parent="water2"]
+position = Vector2( 127.107, 135.87 )
+script = SubResource( 27 )
+
+[node name="col" type="CollisionShape2D" parent="water2/water_area"]
+position = Vector2( 0.967445, 6.79352 )
+shape = SubResource( 26 )
+
 [connection signal="body_exited" from="playarea" to="playarea" method="_on_playarea_body_exited"]
+[connection signal="body_entered" from="water2/water_area" to="water2/water_area" method="_on_water_area_body_entered"]

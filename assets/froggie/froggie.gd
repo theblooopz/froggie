@@ -30,6 +30,7 @@ onready var swing = null
 onready var joint = null
 onready var dancing = false
 onready var jumping = false
+onready var dead = false
 
 var anchors = []
 
@@ -38,6 +39,14 @@ var initial_swing = true
 
 
 func _integrate_forces(state):
+	
+	if dead:
+		
+		tongue.hide()
+		custom_integrator = false
+		set_mode(RigidBody2D.MODE_RIGID)
+		
+		return
 	
 	tongue.set_point_position(0, tongue_start.get_global_transform().origin - get_parent().get_global_transform().origin)
 	
@@ -212,14 +221,18 @@ func _integrate_forces(state):
 		var dist = tongue_begin.distance_to(anchor.get_global_transform().origin - get_parent().get_global_transform().origin)
 		if dist < SWING_POINT_DISTANCE:
 			anchor.get_node("ColorRect").color = Color(1,0,0,1)
-	
+
+func on_death():
+	dead = true
+	$death_timer.start()
 
 func _on_froggie_body_entered(body):
 	
 	if body.is_in_group("TRAP"):
-		get_tree().change_scene("res://assets/test/test.tscn")
-
+		on_death()
 
 func _on_jump_timer_timeout():
 	jumping = false
 
+func _on_death_timer_timeout():
+	get_tree().change_scene("res://assets/test/test.tscn")
