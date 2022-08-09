@@ -150,9 +150,15 @@ wait_time = 0.2
 one_shot = true
 
 [node name="cam" type="RemoteTransform2D" parent="froggie"]
+update_rotation = false
+update_scale = false
 
 [node name="groundray" type="RemoteTransform2D" parent="froggie"]
 remote_path = NodePath("../../groundray")
+update_rotation = false
+
+[node name="ceilingray" type="RemoteTransform2D" parent="froggie"]
+remote_path = NodePath("../../ceilingray")
 update_rotation = false
 
 [node name="swing_zone" type="Area2D" parent="froggie"]
@@ -203,6 +209,11 @@ collision_mask = 2
 [node name="groundray" type="RayCast2D" parent="."]
 enabled = true
 cast_to = Vector2( 0, 30 )
+collision_mask = 2
+
+[node name="ceilingray" type="RayCast2D" parent="."]
+enabled = true
+cast_to = Vector2( 0, -32 )
 collision_mask = 2
 
 [node name="tongue" type="Line2D" parent="."]

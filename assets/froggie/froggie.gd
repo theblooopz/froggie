@@ -22,6 +22,7 @@ onready var swinging = false
 onready var tongue = $"../tongue"
 onready var tongue_ray = $"../tongue_ray"
 onready var groundray = $"../groundray"
+onready var ceilingray = $"../ceilingray"
 onready var tongue_end = Vector2.ZERO
 onready var tongue_begin = Vector2.ZERO
 onready var tongue_start = $tongue_start
@@ -149,6 +150,11 @@ func _integrate_forces(state):
 	if not swinging:
 		if canmove:
 			motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION_FACTOR)
+			
+		if ceilingray.is_colliding() and jumping:
+			jumping = false
+		
+		
 		if groundray.is_colliding() and not jumping:
 			canmove = true
 			var gnl = groundray.get_collision_normal()
@@ -158,20 +164,25 @@ func _integrate_forces(state):
 				
 			var bodies = get_colliding_bodies()
 			var ground_contact = false
+			var ceiling_contact = true
 			var l = 0
 			var idx = 0
 			var a = 0
+			var v = 0
 			for body in bodies:
-				if body.is_in_group("GROUND"):
-					ground_contact = true
+				if body.is_in_group("GROUND") and state.get_contact_count() > 0:
+					
 					l = state.get_contact_local_normal(idx).x
+					v = state.get_contact_local_normal(idx).y
 					a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
-					break
+					
+					if v < 0:
+						ground_contact = true
+						break
 				idx += 1
 			
 			if a > 100:
 				canmove = false
-			
 			
 			if not ground_contact and not jumping:
 				motion.y += GRAVITY
