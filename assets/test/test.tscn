@@ -23,10 +23,17 @@
 [sub_resource type="GDScript" id=21]
 script/source = "extends Area2D
 
+onready var player = null
+
 func _on_playarea_body_exited(body):
 	if body.is_in_group(\"PLAYER\"):
-		if body.has_method(\"on_death\"):
-			body.on_death()
+		player = body
+		$timer.start()
+
+func _on_timer_timeout():
+	if player.has_method(\"on_death\"):
+		if not overlaps_body(player):
+			player.on_death()
 "
 
 [sub_resource type="RectangleShape2D" id=20]
@@ -160,7 +167,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 13.4375, 1.472 )
-shader_param/zoom_y = 0.793701
+shader_param/zoom_y = 0.66742
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -216,6 +223,9 @@ shape = SubResource( 20 )
 __meta__ = {
 "_edit_lock_": true
 }
+
+[node name="timer" type="Timer" parent="playarea"]
+one_shot = true
 
 [node name="background" type="CanvasLayer" parent="."]
 layer = -1
@@ -301,19 +311,16 @@ fit_content_height = true
 scroll_active = false
 
 [node name="sun" type="Light2D" parent="."]
-position = Vector2( 485, -160 )
+position = Vector2( 485, -58 )
 scale = Vector2( 5.14844, 5.14844 )
 texture = ExtResource( 14 )
-texture_scale = 3.0
+texture_scale = 3.21
 color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
-energy = 1.68
+energy = 1.5
 shadow_enabled = true
-shadow_gradient_length = 70.3
+shadow_gradient_length = 70.0
 shadow_filter = 2
 shadow_filter_smooth = 1.9
-__meta__ = {
-"_edit_lock_": true
-}
 
 [node name="bird3" parent="." instance=ExtResource( 16 )]
 position = Vector2( 309, -23 )
@@ -436,7 +443,7 @@ collision_layer = 0
 position = Vector2( 0.876587, -60.0919 )
 shape = SubResource( 6 )
 
-[node name="ground" type="StaticBody2D" parent="."]
+[node name="ground" type="StaticBody2D" parent="." groups=["GROUND"]]
 position = Vector2( 292.328, 480 )
 collision_layer = 2
 
@@ -451,7 +458,7 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="ground2" type="StaticBody2D" parent="."]
+[node name="ground2" type="StaticBody2D" parent="." groups=["GROUND"]]
 position = Vector2( 1360.33, 482 )
 scale = Vector2( -1, 1 )
 collision_layer = 2
@@ -467,7 +474,7 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
+[node name="StaticBody2D" type="StaticBody2D" parent="." groups=["GROUND"]]
 position = Vector2( 1299.33, 320 )
 scale = Vector2( -1, 1 )
 collision_layer = 2
@@ -484,7 +491,7 @@ polygon = PoolVector2Array( -3, -45, -27, 179, 143, 180 )
 [node name="LightOccluder2D" type="LightOccluder2D" parent="StaticBody2D"]
 occluder = SubResource( 22 )
 
-[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+[node name="StaticBody2D2" type="StaticBody2D" parent="." groups=["GROUND"]]
 position = Vector2( 166.328, 319 )
 collision_layer = 2
 
@@ -669,4 +676,5 @@ position = Vector2( 0.967445, 6.79352 )
 shape = SubResource( 26 )
 
 [connection signal="body_exited" from="playarea" to="playarea" method="_on_playarea_body_exited"]
+[connection signal="timeout" from="playarea/timer" to="playarea" method="_on_timer_timeout"]
 [connection signal="body_entered" from="water2/water_area" to="water2/water_area" method="_on_water_area_body_entered"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://assets/froggie/froggie.gd" type="Script" id=1]
 [ext_resource path="res://assets/froggie/froggieSprite0007.png" type="Texture" id=2]
@@ -82,6 +82,15 @@ func _on_swing_zone_body_exited(body):
 [sub_resource type="RectangleShape2D" id=23]
 extents = Vector2( 300, 300 )
 
+[sub_resource type="Gradient" id=28]
+offsets = PoolRealArray( 0.421277, 0.52766, 0.629787 )
+colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 0.734694, 0.886275, 0.886275, 0.886275, 0 )
+
+[sub_resource type="GradientTexture2D" id=29]
+gradient = SubResource( 28 )
+fill = 1
+fill_from = Vector2( 0.516667, 0.548958 )
+
 [sub_resource type="Curve" id=2]
 min_value = 0.25
 max_value = 5.0
@@ -97,6 +106,7 @@ script = SubResource( 24 )
 [node name="froggie" type="RigidBody2D" parent="." groups=["PLAYER"]]
 collision_mask = 2
 mode = 2
+gravity_scale = 5.0
 custom_integrator = true
 continuous_cd = 2
 contacts_reported = 2
@@ -161,6 +171,29 @@ __meta__ = {
 
 [node name="death_timer" type="Timer" parent="froggie"]
 one_shot = true
+
+[node name="blood" type="CPUParticles2D" parent="froggie"]
+position = Vector2( 0, 9.01 )
+emitting = false
+amount = 32
+lifetime = 0.01
+preprocess = 0.6
+speed_scale = 0.01
+explosiveness = 0.22
+randomness = 0.36
+lifetime_randomness = 0.04
+texture = SubResource( 29 )
+emission_shape = 1
+emission_sphere_radius = 11.78
+direction = Vector2( 1, 1 )
+spread = 180.0
+initial_velocity = 100.0
+initial_velocity_random = 1.0
+angular_velocity_random = 1.0
+damping = 26.94
+damping_random = 0.15
+scale_amount = 0.11
+scale_amount_random = 0.13
 
 [node name="tongue_ray" type="RayCast2D" parent="."]
 position = Vector2( 2, -12 )

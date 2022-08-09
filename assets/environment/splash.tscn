@@ -65,7 +65,7 @@ region_rect = Rect2( 0, 0, 64, 32 )
 
 [node name="sfx" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 2 )
-volume_db = -10.0
+volume_db = -20.0
 bus = "SFX"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

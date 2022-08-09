@@ -1,10 +1,14 @@
+#TODO cotton stuffing comes out on death
+
+
+
 extends RigidBody2D
 
 const SPEED = 300
 const RUN_FACTOR = 1.5
 const GRAVITY = 10 * 3
 const JUMP_FORCE = 50
-const ACCELERATION = 0.8
+const ACCELERATION_FACTOR = 0.8
 const SWING_POWER = 9
 const SWING_POINT_DISTANCE = 350
 const ROLL_SPEED = 15
@@ -21,6 +25,7 @@ onready var groundray = $"../groundray"
 onready var tongue_end = Vector2.ZERO
 onready var tongue_begin = Vector2.ZERO
 onready var tongue_start = $tongue_start
+onready var blood = $blood
 
 onready var swing_zone_turn = 1
 
@@ -31,35 +36,33 @@ onready var joint = null
 onready var dancing = false
 onready var jumping = false
 onready var dead = false
+onready var canmove = true
 
 var anchors = []
 
 var rolling = false
 var initial_swing = true
 
+func _ready():
+	$death_timer.stop()
 
 func _integrate_forces(state):
 	
-	if dead:
-		
-		tongue.hide()
-		custom_integrator = false
-		set_mode(RigidBody2D.MODE_RIGID)
-		
-		return
+	if dead: return
 	
-	tongue.set_point_position(0, tongue_start.get_global_transform().origin - get_parent().get_global_transform().origin)
-	
+	tongue.set_point_position(0, tongue_start.get_global_transform().origin\
+	 - get_parent().get_global_transform().origin)
+
 	rolling = Input.is_action_pressed("move_roll")
 	
-	if Input.is_action_pressed("move_run"):
+	if Input.is_action_pressed("move_run") and not dancing:
 		_SPEED = SPEED*RUN_FACTOR
 		_ROLL_SPEED = ROLL_SPEED*RUN_FACTOR
-		$sprite.speed_scale = 2 + RUN_FACTOR
+		$sprite.speed_scale = lerp($sprite.speed_scale, 2 + RUN_FACTOR, ACCELERATION_FACTOR)
 	else:
 		_SPEED = SPEED
 		_ROLL_SPEED = ROLL_SPEED
-		$sprite.speed_scale = 2
+		$sprite.speed_scale = lerp($sprite.speed_scale, 2, ACCELERATION_FACTOR)
 	
 	if swinging:
 		
@@ -144,16 +147,41 @@ func _integrate_forces(state):
 	
 
 	if not swinging:
-		motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION)
+		if canmove:
+			motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION_FACTOR)
 		if groundray.is_colliding() and not jumping:
+			canmove = true
 			var gnl = groundray.get_collision_normal()
 			motion.y = 0
 			motion.y += motion.x  * cos(groundray.get_collision_normal().angle())
 		else:
-			if not jumping:
+				
+			var bodies = get_colliding_bodies()
+			var ground_contact = false
+			var l = 0
+			var idx = 0
+			var a = 0
+			for body in bodies:
+				if body.is_in_group("GROUND"):
+					ground_contact = true
+					l = state.get_contact_local_normal(idx).x
+					a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
+					break
+				idx += 1
+			
+			if a > 100:
+				canmove = false
+			
+			
+			if not ground_contact and not jumping:
 				motion.y += GRAVITY
-			else:
+			if jumping:
+				canmove = true
 				motion.y -= JUMP_FORCE
+			
+			if ground_contact and not jumping:
+				motion.x = lerp(motion.x, _SPEED * sign(l), ACCELERATION_FACTOR)
+				rolling = true
 
 	
 	if swing:
@@ -210,6 +238,7 @@ func _integrate_forces(state):
 	
 	if not groundray.is_colliding():
 		$sprite.animation = "air"
+		
 	
 	#TODO SET SIZE OF EXTENTS OF SWING_ZONE SWING COL TO SWING_POINT_DISTANCE
 	if direction: swing_zone_turn = direction
@@ -222,14 +251,18 @@ func _integrate_forces(state):
 		if dist < SWING_POINT_DISTANCE:
 			anchor.get_node("ColorRect").color = Color(1,0,0,1)
 
-func on_death():
+func on_death(clean = true):
 	dead = true
-	$death_timer.start()
+	tongue.hide()
+	custom_integrator = false
+	call_deferred("set_mode", RigidBody2D.MODE_RIGID)
+	#if not clean: blood.set_emitting(true)
+	$death_timer.call_deferred("start")
 
 func _on_froggie_body_entered(body):
 	
 	if body.is_in_group("TRAP"):
-		on_death()
+		on_death(false)
 
 func _on_jump_timer_timeout():
 	jumping = false
