@@ -79,8 +79,8 @@ func _on_swing_zone_body_exited(body):
 		body.get_node(\"ColorRect\").color = Color(\"0070ff\")
 "
 
-[sub_resource type="RectangleShape2D" id=23]
-extents = Vector2( 300, 300 )
+[sub_resource type="CircleShape2D" id=30]
+radius = 450.0
 
 [sub_resource type="Gradient" id=28]
 offsets = PoolRealArray( 0.421277, 0.52766, 0.629787 )
@@ -103,8 +103,8 @@ colors = PoolColorArray( 1, 0.55, 0.55, 1, 1, 0.49, 0.49, 1 )
 [node name="player" type="Node2D"]
 script = SubResource( 24 )
 
-[node name="froggie" type="RigidBody2D" parent="." groups=["PLAYER"]]
-collision_mask = 2
+[node name="froggie" type="RigidBody2D" parent="." groups=["OBJECT", "PLAYER"]]
+collision_mask = 34
 mode = 2
 gravity_scale = 5.0
 custom_integrator = true
@@ -161,6 +161,11 @@ update_rotation = false
 remote_path = NodePath("../../ceilingray")
 update_rotation = false
 
+[node name="holdray" type="RemoteTransform2D" parent="froggie"]
+remote_path = NodePath("../../holdray")
+update_rotation = false
+update_scale = false
+
 [node name="swing_zone" type="Area2D" parent="froggie"]
 collision_layer = 8
 collision_mask = 4
@@ -170,7 +175,7 @@ __meta__ = {
 }
 
 [node name="swing_col" type="CollisionShape2D" parent="froggie/swing_zone"]
-shape = SubResource( 23 )
+shape = SubResource( 30 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -201,20 +206,29 @@ damping_random = 0.15
 scale_amount = 0.11
 scale_amount_random = 0.13
 
+[node name="hold" type="RemoteTransform2D" parent="froggie"]
+position = Vector2( 0, -50 )
+update_rotation = false
+
 [node name="tongue_ray" type="RayCast2D" parent="."]
 position = Vector2( 2, -12 )
 enabled = true
-collision_mask = 2
+collision_mask = 64
 
 [node name="groundray" type="RayCast2D" parent="."]
 enabled = true
 cast_to = Vector2( 0, 30 )
-collision_mask = 2
+collision_mask = 34
 
 [node name="ceilingray" type="RayCast2D" parent="."]
 enabled = true
-cast_to = Vector2( 0, -32 )
+cast_to = Vector2( 0, -35 )
 collision_mask = 2
+
+[node name="holdray" type="RayCast2D" parent="."]
+enabled = true
+cast_to = Vector2( 35, 0 )
+collision_mask = 32
 
 [node name="tongue" type="Line2D" parent="."]
 light_mask = 0

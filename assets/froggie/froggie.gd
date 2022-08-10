@@ -1,5 +1,6 @@
 #TODO cotton stuffing comes out on death
-
+#TODO lerp lifting the box on head
+#TODO sometimes when frog jumps with box from ends then starts rolling and loses box
 
 
 extends RigidBody2D
@@ -22,6 +23,7 @@ onready var swinging = false
 onready var tongue = $"../tongue"
 onready var tongue_ray = $"../tongue_ray"
 onready var groundray = $"../groundray"
+onready var holdray = $"../holdray"
 onready var ceilingray = $"../ceilingray"
 onready var tongue_end = Vector2.ZERO
 onready var tongue_begin = Vector2.ZERO
@@ -38,6 +40,7 @@ onready var dancing = false
 onready var jumping = false
 onready var dead = false
 onready var canmove = true
+onready var held_object = null
 
 var anchors = []
 
@@ -53,6 +56,7 @@ func _integrate_forces(state):
 	
 	tongue.set_point_position(0, tongue_start.get_global_transform().origin\
 	 - get_parent().get_global_transform().origin)
+	
 
 	rolling = Input.is_action_pressed("move_roll")
 	
@@ -85,7 +89,6 @@ func _integrate_forces(state):
 	var direction = Input.get_action_strength("move_right") \
 	- Input.get_action_strength("move_left")
 	
-	
 	if swinging and anchor:
 		tongue_begin = get_position() - tongue_start.get_position()
 		tongue_end = lerp(tongue_end + tongue_begin.direction_to(\
@@ -95,7 +98,7 @@ func _integrate_forces(state):
 		
 		swing.apply_central_impulse(Vector2(direction*SWING_POWER,0))
 		#TODO MAGIC NUMBER
-		swing.set_angular_velocity(direction*3)
+		if not held_object: swing.set_angular_velocity(direction*3)
 		if not tongue.visible: tongue.show()
 	else:
 		tongue_begin = tongue_start.get_global_transform().origin - get_parent().get_global_transform().origin
@@ -151,30 +154,31 @@ func _integrate_forces(state):
 		if canmove:
 			motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION_FACTOR)
 			
-		if ceilingray.is_colliding() and jumping:
+		if ceilingray.is_colliding() and jumping and not held_object:
 			jumping = false
 		
 		
 		if groundray.is_colliding() and not jumping:
 			canmove = true
-			var gnl = groundray.get_collision_normal()
+			#var gnl = groundray.get_collision_normal()
 			motion.y = 0
 			motion.y += motion.x  * cos(groundray.get_collision_normal().angle())
 		else:
 				
 			var bodies = get_colliding_bodies()
 			var ground_contact = false
-			var ceiling_contact = true
+			#var ceiling_contact = true
 			var l = 0
 			var idx = 0
 			var a = 0
 			var v = 0
 			for body in bodies:
-				if body.is_in_group("GROUND") and state.get_contact_count() > 0:
+				if body.is_in_group("GROUND")and state.get_contact_count() > 0:
 					
-					l = state.get_contact_local_normal(idx).x
-					v = state.get_contact_local_normal(idx).y
-					a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
+					if state.get_contact_count() > idx:
+						l = state.get_contact_local_normal(idx).x
+						v = state.get_contact_local_normal(idx).y
+						a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
 					
 					if v < 0:
 						ground_contact = true
@@ -220,7 +224,6 @@ func _integrate_forces(state):
 			elif abs(state.transform.get_rotation()) >= 0.1:
 				state.set_angular_velocity(_ROLL_SPEED * direction)
 			else:
-				#state.set_angular_velocity(0)
 				$sprite.animation = "run"
 				call_deferred("set_mode", RigidBody2D.MODE_CHARACTER)
 		else:
@@ -249,7 +252,58 @@ func _integrate_forces(state):
 	
 	if not groundray.is_colliding():
 		$sprite.animation = "air"
-		
+	
+	
+	if direction:
+		if direction < 0:
+			holdray.cast_to =Vector2(-abs(holdray.cast_to.x), holdray.cast_to.y)
+		else:
+			holdray.cast_to = Vector2(abs(holdray.cast_to.x), holdray.cast_to.y)
+	
+	if Input.is_action_just_pressed("move_action"):
+		if not held_object:
+			if holdray.is_colliding() and groundray.is_colliding() and not swinging and not rolling and not jumping:
+				if abs(state.transform.get_rotation()) < 0.1:
+					var obj = holdray.get_collider()
+					if obj.is_in_group("OBJECT"):
+						obj.custom_integrator = true
+						obj.set_angular_velocity(0)
+						obj.set_linear_velocity(Vector2.ZERO)
+						held_object = obj
+						$hold.set_remote_node(obj.get_path())
+		else:
+			var vl = state.get_linear_velocity()
+			var al = state.get_angular_velocity()
+			
+			if floor(abs(vl.x)) == 0:
+				vl = Vector2(100,-100)
+				if $sprite.scale.x < 0:
+					vl.x = -abs(vl.x)
+
+			held_object.set_linear_velocity(vl)
+			held_object.set_angular_velocity(al)
+			
+			held_object.custom_integrator = false
+			held_object.set_sleeping(false)
+			held_object = null
+			$hold.set_remote_node("")
+	
+	if held_object:
+		state.set_angular_velocity(0)
+		held_object.set_angular_velocity(0)
+	
+		if abs(state.transform.get_rotation()) > 0.1:
+			held_object.custom_integrator = false
+			held_object.set_sleeping(false)
+			held_object = null
+			$hold.set_remote_node("")
+	
+	if rolling and held_object:
+		held_object.custom_integrator = false
+		held_object.set_sleeping(false)
+		held_object = null
+		$hold.set_remote_node("")
+	
 	
 	#TODO SET SIZE OF EXTENTS OF SWING_ZONE SWING COL TO SWING_POINT_DISTANCE
 	if direction: swing_zone_turn = direction
@@ -262,12 +316,20 @@ func _integrate_forces(state):
 		if dist < SWING_POINT_DISTANCE:
 			anchor.get_node("ColorRect").color = Color(1,0,0,1)
 
-func on_death(clean = true):
+func on_death(_clean = true):
+	
+	if held_object:
+		held_object.custom_integrator = false
+		held_object.set_sleeping(false)
+		held_object = null
+		$hold.set_remote_node("")
+	
 	dead = true
+	rolling = true
 	tongue.hide()
 	custom_integrator = false
 	call_deferred("set_mode", RigidBody2D.MODE_RIGID)
-	#if not clean: blood.set_emitting(true)
+	#TODO if not _clean: blood.set_emitting(true)
 	$death_timer.call_deferred("start")
 
 func _on_froggie_body_entered(body):
@@ -279,4 +341,5 @@ func _on_jump_timer_timeout():
 	jumping = false
 
 func _on_death_timer_timeout():
-	get_tree().change_scene("res://assets/test/test.tscn")
+	var _r = get_tree().change_scene("res://assets/test/test.tscn")
+

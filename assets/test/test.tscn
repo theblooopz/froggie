@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=2]
+[gd_scene load_steps=38 format=2]
 
 [ext_resource path="res://assets/test/test.png" type="Texture" id=1]
 [ext_resource path="res://assets/froggie/player.tscn" type="PackedScene" id=2]
@@ -19,6 +19,7 @@
 [ext_resource path="res://assets/audio/forest_ambience.wav" type="AudioStream" id=17]
 [ext_resource path="res://assets/scripts/wind.shader" type="Shader" id=18]
 [ext_resource path="res://assets/test/grass.png" type="Texture" id=19]
+[ext_resource path="res://assets/objects/crate.tscn" type="PackedScene" id=20]
 
 [sub_resource type="GDScript" id=24]
 script/source = "extends CanvasLayer
@@ -103,7 +104,7 @@ func _ready():
 
 
 func _on_playarea_body_exited(body):
-	if body.is_in_group(\"PLAYER\"):
+	if body.is_in_group(\"OBJECT\"):
 		player = body
 		$timer.start()
 
@@ -111,6 +112,9 @@ func _on_timer_timeout():
 	if player.has_method(\"on_death\"):
 		if not overlaps_body(player):
 			player.on_death()
+	else:
+		if not overlaps_body(player):
+			player.queue_free()
 "
 
 [sub_resource type="RectangleShape2D" id=20]
@@ -175,7 +179,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 19.9766, 1.472 )
-shader_param/zoom_y = 2.99661
+shader_param/zoom_y = 1.25992
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -186,7 +190,7 @@ script/source = "extends Area2D
 onready var splash = preload(\"res://assets/environment/splash.tscn\")
 
 func _on_water_area_body_entered(body):
-	if body.is_in_group(\"PLAYER\"):
+	if body.is_in_group(\"OBJECT\"):
 		var si = splash.instance()
 		si.set_position(body.get_global_transform().origin + Vector2(0,10))
 		get_parent().get_parent().add_child(si)
@@ -208,7 +212,7 @@ anchor_right = 0.042
 margin_left = -28.4
 margin_top = 10.0
 margin_right = 287.24
-margin_bottom = 238.0
+margin_bottom = 253.0
 custom_styles/panel = SubResource( 23 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="HUD/panel"]
@@ -230,6 +234,7 @@ Hold W = tongue grapple/jump
 Hold S = roll
 press Q = dance
 Press R = restart
+Press E = hold/release box
 Press Ctrl+Enter = toggle fullscreen"
 text = "INSTRUCTIONS
 
@@ -242,6 +247,7 @@ Hold W = tongue grapple/jump
 Hold S = roll
 press Q = dance
 Press R = restart
+Press E = hold/release box
 Press Ctrl+Enter = toggle fullscreen"
 fit_content_height = true
 scroll_active = false
@@ -298,6 +304,7 @@ __meta__ = {
 }
 
 [node name="timer" type="Timer" parent="playarea"]
+wait_time = 0.5
 one_shot = true
 
 [node name="background" type="CanvasLayer" parent="."]
@@ -309,10 +316,20 @@ margin_top = -187.0
 margin_right = 1650.0
 margin_bottom = 957.0
 
+[node name="bird2" parent="background" instance=ExtResource( 16 )]
+position = Vector2( 933, 182 )
+rotation = -0.180338
+scale = Vector2( -1.8, 1.8 )
+
+[node name="bird4" parent="background" instance=ExtResource( 16 )]
+position = Vector2( 17, 349 )
+rotation = 2.08825
+scale = Vector2( -1.8, 1.8 )
+
 [node name="bird3" parent="background" instance=ExtResource( 16 )]
-position = Vector2( 309, -23 )
-rotation = 0.396325
-scale = Vector2( 2, 2 )
+position = Vector2( 1708, 86 )
+rotation = -0.396708
+scale = Vector2( -2, 2 )
 
 [node name="clouds" type="CanvasLayer" parent="."]
 layer = -1
@@ -335,11 +352,6 @@ shadow_enabled = true
 shadow_gradient_length = 70.0
 shadow_filter = 2
 shadow_filter_smooth = 1.9
-
-[node name="bird2" parent="." instance=ExtResource( 16 )]
-position = Vector2( 795, 115 )
-rotation = -0.180338
-scale = Vector2( 1.8, 1.8 )
 
 [node name="spikes" type="Node2D" parent="."]
 position = Vector2( 850.328, 622 )
@@ -455,6 +467,7 @@ shape = SubResource( 6 )
 [node name="ground" type="StaticBody2D" parent="." groups=["GROUND"]]
 position = Vector2( 292.328, 480 )
 collision_layer = 2
+collision_mask = 65
 
 [node name="Sprite" type="Sprite" parent="ground"]
 position = Vector2( 193.345, 143.096 )
@@ -471,6 +484,7 @@ __meta__ = {
 position = Vector2( 1360.33, 482 )
 scale = Vector2( -1, 1 )
 collision_layer = 2
+collision_mask = 65
 
 [node name="Sprite" type="Sprite" parent="ground2"]
 position = Vector2( 191.345, 141.096 )
@@ -486,6 +500,7 @@ __meta__ = {
 [node name="ground3" type="StaticBody2D" parent="." groups=["GROUND"]]
 position = Vector2( 2400, 526 )
 collision_layer = 2
+collision_mask = 65
 
 [node name="Sprite" type="Sprite" parent="ground3"]
 position = Vector2( 191.345, 141.096 )
@@ -502,6 +517,7 @@ __meta__ = {
 position = Vector2( 1299.33, 320 )
 scale = Vector2( -1, 1 )
 collision_layer = 2
+collision_mask = 65
 
 [node name="Polygon2D" type="Polygon2D" parent="StaticBody2D"]
 color = Color( 0.529412, 0.529412, 0.529412, 1 )
@@ -520,6 +536,7 @@ position = Vector2( 2327, 200 )
 rotation = 0.12351
 scale = Vector2( -1, 1 )
 collision_layer = 2
+collision_mask = 65
 
 [node name="Polygon2D" type="Polygon2D" parent="StaticBody2D3"]
 color = Color( 0.529412, 0.529412, 0.529412, 1 )
@@ -537,6 +554,7 @@ occluder = SubResource( 22 )
 position = Vector2( 2559, 205 )
 rotation = -0.114333
 collision_layer = 2
+collision_mask = 65
 
 [node name="Polygon2D" type="Polygon2D" parent="StaticBody2D4"]
 color = Color( 0.529412, 0.529412, 0.529412, 1 )
@@ -553,6 +571,7 @@ occluder = SubResource( 22 )
 [node name="StaticBody2D2" type="StaticBody2D" parent="." groups=["GROUND"]]
 position = Vector2( 166.328, 319 )
 collision_layer = 2
+collision_mask = 65
 
 [node name="Polygon2D" type="Polygon2D" parent="StaticBody2D2"]
 color = Color( 0.529412, 0.529412, 0.529412, 1 )
@@ -723,7 +742,23 @@ position = Vector2( 1537, 319 )
 rotation = 3.70234
 scale = Vector2( -0.75, 0.75 )
 
-[node name="water2" type="Sprite" parent="."]
+[node name="crate" parent="." instance=ExtResource( 20 )]
+position = Vector2( 507, 459 )
+
+[node name="crate2" parent="." instance=ExtResource( 20 )]
+position = Vector2( 563, 462 )
+
+[node name="crate3" parent="." instance=ExtResource( 20 )]
+position = Vector2( 516, 394 )
+
+[node name="crate4" parent="." instance=ExtResource( 20 )]
+position = Vector2( 570, 397 )
+
+[node name="water" type="CanvasLayer" parent="."]
+layer = 2
+follow_viewport_enable = true
+
+[node name="water2" type="Sprite" parent="water"]
 material = SubResource( 13 )
 position = Vector2( -980, 596 )
 scale = Vector2( 19.9766, 1.472 )
@@ -732,14 +767,16 @@ normal_map = ExtResource( 7 )
 centered = false
 script = ExtResource( 10 )
 
-[node name="water_area" type="Area2D" parent="water2"]
-position = Vector2( 127.107, 135.87 )
+[node name="water_area" type="Area2D" parent="water/water2"]
+position = Vector2( 127.299, 148.777 )
+collision_layer = 0
+collision_mask = 33
 script = SubResource( 27 )
 
-[node name="col" type="CollisionShape2D" parent="water2/water_area"]
+[node name="col" type="CollisionShape2D" parent="water/water2/water_area"]
 position = Vector2( 0.967445, 6.79352 )
 shape = SubResource( 26 )
 
 [connection signal="body_exited" from="playarea" to="playarea" method="_on_playarea_body_exited"]
 [connection signal="timeout" from="playarea/timer" to="playarea" method="_on_timer_timeout"]
-[connection signal="body_entered" from="water2/water_area" to="water2/water_area" method="_on_water_area_body_entered"]
+[connection signal="body_entered" from="water/water2/water_area" to="water/water2/water_area" method="_on_water_area_body_entered"]

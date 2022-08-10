@@ -3,15 +3,15 @@ tool
 extends Sprite
 
 func _ready() -> void:
-	connect("item_rect_changed", self, "update_scale")
-	connect("texture_changed", self, "update_aspect_ratio")
+	var _r = connect("item_rect_changed", self, "update_scale")
+	_r = connect("texture_changed", self, "update_aspect_ratio")
 
 	update_aspect_ratio()
 	update_zoom()
 	update_scale()
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	update_zoom()
 
 
