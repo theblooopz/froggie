@@ -11,7 +11,7 @@ const GRAVITY = 10 * 3
 const JUMP_FORCE = 50
 const ACCELERATION_FACTOR = 0.8
 const SWING_POWER = 9
-const SWING_POINT_DISTANCE = 350
+const SWING_POINT_DISTANCE = 400
 const ROLL_SPEED = 15
 
 
@@ -272,12 +272,11 @@ func _integrate_forces(state):
 						held_object = obj
 						$hold.set_remote_node(obj.get_path())
 		else:
-			var vl = state.get_linear_velocity()
+			#TODO make this vector2 a constant
+			var vl = state.get_linear_velocity() + Vector2(100,-100)
 			var al = state.get_angular_velocity()
 			
-			if floor(abs(vl.x)) == 0:
-				vl = Vector2(100,-100)
-				if $sprite.scale.x < 0:
+			if $sprite.scale.x < 0:
 					vl.x = -abs(vl.x)
 
 			held_object.set_linear_velocity(vl)
@@ -323,7 +322,7 @@ func on_death(_clean = true):
 		held_object.set_sleeping(false)
 		held_object = null
 		$hold.set_remote_node("")
-	
+	$sprite.animation = "air"
 	dead = true
 	rolling = true
 	tongue.hide()
