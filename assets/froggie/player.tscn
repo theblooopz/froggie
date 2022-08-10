@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=30 format=2]
 
 [ext_resource path="res://assets/froggie/froggie.gd" type="Script" id=1]
 [ext_resource path="res://assets/froggie/froggieSprite0007.png" type="Texture" id=2]
@@ -15,6 +15,8 @@
 [ext_resource path="res://assets/froggie/froggieSprite0005.png" type="Texture" id=13]
 [ext_resource path="res://assets/froggie/froggieSprite0002.png" type="Texture" id=14]
 [ext_resource path="res://assets/froggie/froggieSprite0013.png" type="Texture" id=15]
+[ext_resource path="res://assets/froggie/dust_particle.png" type="Texture" id=16]
+[ext_resource path="res://assets/audio/mud02.ogg" type="AudioStream" id=17]
 
 [sub_resource type="GDScript" id=24]
 script/source = "extends Node2D
@@ -25,7 +27,16 @@ onready var cam = $\"froggie/cam\"
 
 func _ready():
 	cam.set_remote_node(get_node(camera).get_path())
+	yield(get_tree(), \"idle_frame\")
+	get_node(camera).set_enable_follow_smoothing(true)
 "
+
+[sub_resource type="Curve" id=31]
+_data = [ Vector2( 0, 0.235227 ), 0.0, 0.488648, 0, 0, Vector2( 1, 0.6625 ), -0.106294, 0.0, 0, 0 ]
+
+[sub_resource type="Gradient" id=32]
+offsets = PoolRealArray( 0.757202, 0.897119, 1 )
+colors = PoolColorArray( 1, 1, 1, 0.8, 1, 1, 1, 0, 1, 1, 1, 0 )
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -103,13 +114,36 @@ colors = PoolColorArray( 1, 0.55, 0.55, 1, 1, 0.49, 0.49, 1 )
 [node name="player" type="Node2D"]
 script = SubResource( 24 )
 
+[node name="dust" type="CPUParticles2D" parent="."]
+position = Vector2( 0, 20.684 )
+emitting = false
+amount = 64
+lifetime = 2.0
+speed_scale = 0.75
+lifetime_randomness = 0.06
+local_coords = false
+texture = ExtResource( 16 )
+emission_shape = 1
+emission_sphere_radius = 3.72
+gravity = Vector2( 0, -8 )
+initial_velocity = 10.0
+initial_velocity_random = 0.5
+angular_velocity = 50.0
+angular_velocity_random = 0.3
+angle = 520.9
+angle_random = 0.47
+scale_amount = 0.38
+scale_amount_curve = SubResource( 31 )
+color = Color( 0.847059, 0.686275, 0.560784, 1 )
+color_ramp = SubResource( 32 )
+
 [node name="froggie" type="RigidBody2D" parent="." groups=["OBJECT", "PLAYER"]]
 collision_mask = 34
 mode = 2
 gravity_scale = 5.0
 custom_integrator = true
 continuous_cd = 2
-contacts_reported = 3
+contacts_reported = 4
 contact_monitor = true
 can_sleep = false
 script = ExtResource( 1 )
@@ -210,15 +244,26 @@ scale_amount_random = 0.13
 position = Vector2( 0, -50 )
 update_rotation = false
 
+[node name="footstep" type="AudioStreamPlayer" parent="froggie"]
+stream = ExtResource( 17 )
+volume_db = -15.0
+pitch_scale = 0.95
+bus = "SFX"
+
 [node name="tongue_ray" type="RayCast2D" parent="."]
 position = Vector2( 2, -12 )
 enabled = true
-collision_mask = 64
+collision_mask = 66
 
 [node name="groundray" type="RayCast2D" parent="."]
 enabled = true
 cast_to = Vector2( 0, 30 )
 collision_mask = 34
+
+[node name="dust" type="RemoteTransform2D" parent="groundray"]
+position = Vector2( 0, 20.684 )
+remote_path = NodePath("../../dust")
+update_rotation = false
 
 [node name="ceilingray" type="RayCast2D" parent="."]
 enabled = true
@@ -231,6 +276,7 @@ cast_to = Vector2( 35, 0 )
 collision_mask = 32
 
 [node name="tongue" type="Line2D" parent="."]
+visible = false
 light_mask = 0
 points = PoolVector2Array( 0, 0, 0, 50 )
 width_curve = SubResource( 2 )

@@ -25,6 +25,7 @@ onready var tongue_ray = $"../tongue_ray"
 onready var groundray = $"../groundray"
 onready var holdray = $"../holdray"
 onready var ceilingray = $"../ceilingray"
+onready var dust = $"../dust"
 onready var tongue_end = Vector2.ZERO
 onready var tongue_begin = Vector2.ZERO
 onready var tongue_start = $tongue_start
@@ -64,10 +65,12 @@ func _integrate_forces(state):
 		_SPEED = SPEED*RUN_FACTOR
 		_ROLL_SPEED = ROLL_SPEED*RUN_FACTOR
 		$sprite.speed_scale = lerp($sprite.speed_scale, 2 + RUN_FACTOR, ACCELERATION_FACTOR)
+		$footstep.set_pitch_scale(RUN_FACTOR)
 	else:
 		_SPEED = SPEED
 		_ROLL_SPEED = ROLL_SPEED
 		$sprite.speed_scale = lerp($sprite.speed_scale, 2, ACCELERATION_FACTOR)
+		$footstep.set_pitch_scale(0.95)
 	
 	if swinging:
 		
@@ -88,6 +91,10 @@ func _integrate_forces(state):
 		
 	var direction = Input.get_action_strength("move_right") \
 	- Input.get_action_strength("move_left")
+	
+	if not direction or not groundray.is_colliding():
+		if $footstep.is_playing(): $footstep.stop()
+		if dust.is_emitting(): dust.set_emitting(false)
 	
 	if swinging and anchor:
 		tongue_begin = get_position() - tongue_start.get_position()
@@ -153,6 +160,11 @@ func _integrate_forces(state):
 	if not swinging:
 		if canmove:
 			motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION_FACTOR)
+			if abs(direction) and groundray.is_colliding():
+				if groundray.get_collider().is_in_group("DIRT"):
+					if not $footstep.is_playing() and not rolling and abs(state.transform.get_rotation()) < 0.1:
+						$footstep.play()
+					if not dust.is_emitting(): dust.set_emitting(true)
 			
 		if ceilingray.is_colliding() and jumping and not held_object:
 			jumping = false
@@ -187,6 +199,7 @@ func _integrate_forces(state):
 			
 			if a > 100:
 				canmove = false
+
 			
 			if not ground_contact and not jumping:
 				motion.y += GRAVITY
