@@ -246,7 +246,7 @@ update_rotation = false
 
 [node name="footstep" type="AudioStreamPlayer" parent="froggie"]
 stream = ExtResource( 17 )
-volume_db = -15.0
+volume_db = -20.0
 pitch_scale = 0.95
 bus = "SFX"
 

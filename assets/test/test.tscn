@@ -180,7 +180,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 0.832849
+shader_param/zoom_y = 0.249116
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -191,7 +191,15 @@ script/source = "extends Area2D
 onready var splash = preload(\"res://assets/environment/splash.tscn\")
 
 func _on_water_area_body_entered(body):
-	if body.is_in_group(\"OBJECT\"):
+	if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
+		var si = splash.instance()
+		si.set_position(body.get_global_transform().origin + Vector2(0,10))
+		get_parent().get_parent().add_child(si)
+		si.get_node(\"AnimationPlayer\").play(\"splash\")
+
+
+func _on_water_area_body_exited(body):
+	if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
 		var si = splash.instance()
 		si.set_position(body.get_global_transform().origin + Vector2(0,10))
 		get_parent().get_parent().add_child(si)
@@ -282,9 +290,9 @@ anims/fadein = SubResource( 8 )
 
 [node name="ambience" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 17 )
-volume_db = -30.0
+volume_db = -45.0
 autoplay = true
-bus = "SFX"
+bus = "Ambience"
 
 [node name="camera" type="Camera2D" parent="."]
 position = Vector2( -17, 5 )
@@ -675,22 +683,21 @@ position = Vector2( 857, 233 )
 
 [node name="rope" parent="objects" instance=ExtResource( 32 )]
 position = Vector2( 1325, 227 )
-JOINT_SOFTNESS = 0.0
+JOINT_SOFTNESS = 0.15
 LINE_WIDTH = 8
 SEGMENT_HEIGHT = 7
 
 [node name="rope2" parent="objects" instance=ExtResource( 32 )]
-position = Vector2( 2309, -81 )
-JOINT_SOFTNESS = 0.0
-SEGMENT_WIDTH = 64
+position = Vector2( 2577, 276 )
+JOINT_SOFTNESS = 0.15
 LINE_WIDTH = 8
 SEGMENT_HEIGHT = 7
 
 [node name="rope" parent="objects/rope2" index="0"]
-points = PoolVector2Array( 953, 1, 0, 0 )
+points = PoolVector2Array( 604, 1, 0, 0 )
 
 [node name="end" parent="objects/rope2" index="4"]
-position = Vector2( 956, 0 )
+position = Vector2( 604, 0 )
 
 [node name="mushroom" parent="objects" instance=ExtResource( 33 )]
 position = Vector2( 3462, -145 )
@@ -1004,6 +1011,7 @@ position = Vector2( 0.967445, 6.79352 )
 shape = SubResource( 26 )
 
 [connection signal="body_entered" from="water/water_area" to="water/water_area" method="_on_water_area_body_entered"]
+[connection signal="body_exited" from="water/water_area" to="water/water_area" method="_on_water_area_body_exited"]
 
 [editable path="objects/rope"]
 [editable path="objects/rope2"]
