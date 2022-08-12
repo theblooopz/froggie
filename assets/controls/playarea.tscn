@@ -1,0 +1,46 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="GDScript" id=21]
+script/source = "extends Area2D
+
+export(NodePath) var camera
+
+onready var player = null
+
+func _ready():
+	var cam = get_node(camera)
+	$collision.shape.set_extents(Vector2(cam.limit_right, cam.limit_bottom))
+	$collision.transform.origin = $collision.shape.extents/2
+
+
+func _on_playarea_body_exited(body):
+	if body.is_in_group(\"OBJECT\"):
+		player = body
+		$death_timer.start()
+
+func _on_timer_timeout():
+	if player.has_method(\"on_death\"):
+		if not overlaps_body(player):
+			player.on_death()
+	else:
+		if not overlaps_body(player):
+			player.queue_free()
+"
+
+[sub_resource type="RectangleShape2D" id=20]
+extents = Vector2( 176, 120.5 )
+
+[node name="playarea" type="Area2D"]
+collision_layer = 0
+script = SubResource( 21 )
+camera = NodePath("../camera")
+
+[node name="collision" type="CollisionShape2D" parent="."]
+shape = SubResource( 20 )
+
+[node name="death_timer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[connection signal="body_exited" from="." to="." method="_on_playarea_body_exited"]
+[connection signal="timeout" from="death_timer" to="." method="_on_timer_timeout"]

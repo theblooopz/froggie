@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=2]
+[gd_scene load_steps=60 format=2]
 
 [ext_resource path="res://assets/scripts/polyfill.gd" type="Script" id=1]
 [ext_resource path="res://assets/froggie/player.tscn" type="PackedScene" id=2]
@@ -28,6 +28,10 @@
 [ext_resource path="res://assets/environment/trees/14.png" type="Texture" id=26]
 [ext_resource path="res://assets/environment/trees/10.png" type="Texture" id=27]
 [ext_resource path="res://assets/environment/trees/22.png" type="Texture" id=28]
+[ext_resource path="res://assets/objects/seesaw.tscn" type="PackedScene" id=29]
+[ext_resource path="res://assets/controls/playarea.tscn" type="PackedScene" id=30]
+[ext_resource path="res://assets/environment/trees/16.png" type="Texture" id=31]
+[ext_resource path="res://assets/objects/rope_texture.png" type="Texture" id=32]
 
 [sub_resource type="GDScript" id=24]
 script/source = "extends CanvasLayer
@@ -98,36 +102,6 @@ tracks/1/keys = {
 "values": [ true, false ]
 }
 
-[sub_resource type="GDScript" id=21]
-script/source = "extends Area2D
-
-export(NodePath) var camera
-
-onready var player = null
-
-func _ready():
-	var cam = get_node(camera)
-	$collision.shape.set_extents(Vector2(cam.limit_right, cam.limit_bottom))
-	$collision.transform.origin = $collision.shape.extents/2
-
-
-func _on_playarea_body_exited(body):
-	if body.is_in_group(\"OBJECT\"):
-		player = body
-		$timer.start()
-
-func _on_timer_timeout():
-	if player.has_method(\"on_death\"):
-		if not overlaps_body(player):
-			player.on_death()
-	else:
-		if not overlaps_body(player):
-			player.queue_free()
-"
-
-[sub_resource type="RectangleShape2D" id=20]
-extents = Vector2( 1319, 969 )
-
 [sub_resource type="Gradient" id=15]
 offsets = PoolRealArray( 0.484848, 0.558442 )
 colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
@@ -153,12 +127,12 @@ extents = Vector2( 201.578, 72.835 )
 [sub_resource type="ShaderMaterial" id=29]
 shader = ExtResource( 18 )
 shader_param/speed = 1.0
-shader_param/minStrength = 0.075
-shader_param/maxStrength = 0.187
+shader_param/minStrength = 0.014
+shader_param/maxStrength = 0.058
 shader_param/strengthScale = 100.0
 shader_param/interval = 3.5
 shader_param/detail = 1.025
-shader_param/distortion = 0.429
+shader_param/distortion = 0.06
 shader_param/heightOffset = 0.0
 
 [sub_resource type="OccluderPolygon2D" id=30]
@@ -169,6 +143,44 @@ polygon = PoolVector2Array( -1, -42, -27, 179, 143, 180 )
 
 [sub_resource type="OccluderPolygon2D" id=31]
 polygon = PoolVector2Array( -14, 73, 33, 78, 142, 179, -25, 177, -43, 168, -39, 105 )
+
+[sub_resource type="GDScript" id=33]
+script/source = "extends Node2D
+	
+func _process(delta):
+	var list = []
+	
+	list.append($begin.get_position())
+	
+	for segment in $segments.get_children():
+		list.append($segments.get_position() + segment.get_position())
+	
+	list.append($end.get_position())
+	
+	$rope.set_points(list)
+
+"
+
+[sub_resource type="CircleShape2D" id=34]
+radius = 7.0
+
+[sub_resource type="RectangleShape2D" id=35]
+extents = Vector2( 51.5, 6 )
+
+[sub_resource type="RectangleShape2D" id=36]
+extents = Vector2( 49, 6 )
+
+[sub_resource type="RectangleShape2D" id=37]
+extents = Vector2( 50.25, 6 )
+
+[sub_resource type="RectangleShape2D" id=38]
+extents = Vector2( 49.5, 6 )
+
+[sub_resource type="RectangleShape2D" id=39]
+extents = Vector2( 50, 6 )
+
+[sub_resource type="RectangleShape2D" id=40]
+extents = Vector2( 47, 6 )
 
 [sub_resource type="ShaderMaterial" id=25]
 shader = ExtResource( 18 )
@@ -204,7 +216,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 0.890899
+shader_param/zoom_y = 0.66742
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -224,6 +236,10 @@ func _on_water_area_body_entered(body):
 
 [sub_resource type="RectangleShape2D" id=26]
 extents = Vector2( 128.819, 118.206 )
+
+[sub_resource type="Environment" id=32]
+adjustment_enabled = true
+adjustment_brightness = 8.0
 
 [node name="test" type="Node2D"]
 
@@ -322,23 +338,7 @@ editor_draw_limits = true
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 color = Color( 0.780392, 1, 0.972549, 1 )
 
-[node name="playarea" type="Area2D" parent="."]
-collision_layer = 0
-script = SubResource( 21 )
-__meta__ = {
-"_edit_lock_": true
-}
-camera = NodePath("../camera")
-
-[node name="collision" type="CollisionShape2D" parent="playarea"]
-shape = SubResource( 20 )
-__meta__ = {
-"_edit_lock_": true
-}
-
-[node name="timer" type="Timer" parent="playarea"]
-wait_time = 0.5
-one_shot = true
+[node name="playarea" parent="." instance=ExtResource( 30 )]
 
 [node name="background" type="CanvasLayer" parent="."]
 layer = -1
@@ -375,6 +375,7 @@ texture = ExtResource( 11 )
 centered = false
 
 [node name="sun" type="Light2D" parent="."]
+position = Vector2( 0, -8 )
 texture = ExtResource( 14 )
 texture_scale = 3.5
 color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
@@ -499,13 +500,19 @@ shape = SubResource( 6 )
 
 [node name="Sprite" type="Sprite" parent="trees"]
 material = SubResource( 29 )
-position = Vector2( 347, 330 )
+position = Vector2( 370, 330 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 25 )
 
+[node name="Sprite5" type="Sprite" parent="trees"]
+position = Vector2( 1456, 479 )
+scale = Vector2( -1, 1 )
+texture = ExtResource( 31 )
+
 [node name="Sprite2" type="Sprite" parent="trees"]
 material = SubResource( 29 )
-position = Vector2( 2273, 497 )
+position = Vector2( 1621, 465 )
+rotation = 0.551986
 scale = Vector2( -1, 1 )
 texture = ExtResource( 27 )
 
@@ -519,89 +526,93 @@ texture = ExtResource( 28 )
 [node name="Sprite4" type="Sprite" parent="trees"]
 modulate = Color( 0.654902, 0.752941, 0.443137, 1 )
 material = SubResource( 29 )
-position = Vector2( 2556, 585 )
-rotation = -0.388818
+position = Vector2( 2442, 451 )
 scale = Vector2( 1.4233, 1.4944 )
 texture = ExtResource( 26 )
 
-[node name="StaticBody2D" type="StaticBody2D" parent="." groups=["GROUND"]]
+[node name="rocks" type="Node2D" parent="."]
 position = Vector2( 1297, 342 )
-scale = Vector2( -1, 1 )
+rotation = 3.14159
+scale = Vector2( 1, -1 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="rocks" groups=["GROUND"]]
 collision_layer = 2
 collision_mask = 65
 
-[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D"]
+[node name="Polygon2D" type="Polygon2D" parent="rocks/StaticBody2D"]
 color = Color( 0.854902, 0.854902, 0.854902, 1 )
 antialiased = true
 texture = ExtResource( 21 )
 texture_scale = Vector2( 3, 3 )
 polygon = PoolVector2Array( -97, 90, -23, 82, 38, 110, 69, 160, 66, 199, -43, 198, -144, 185, -133, 132 )
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="rocks/StaticBody2D"]
 position = Vector2( 1, 0 )
 polygon = PoolVector2Array( -97, 90, -23, 82, 38, 110, 69, 160, 66, 199, -43, 198, -144, 185, -133, 132 )
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="StaticBody2D"]
+[node name="LightOccluder2D" type="LightOccluder2D" parent="rocks/StaticBody2D"]
 occluder = SubResource( 30 )
 
-[node name="StaticBody2D3" type="StaticBody2D" parent="." groups=["GROUND"]]
-position = Vector2( 2327, 200 )
-rotation = 0.12351
-scale = Vector2( -1, 1 )
+[node name="StaticBody2D3" type="StaticBody2D" parent="rocks" groups=["GROUND"]]
+position = Vector2( -1030, -142 )
+rotation = -0.12351
 collision_layer = 2
 collision_mask = 65
 
-[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D3"]
+[node name="Polygon2D" type="Polygon2D" parent="rocks/StaticBody2D3"]
 color = Color( 0.854902, 0.854902, 0.854902, 1 )
 antialiased = true
 texture = ExtResource( 21 )
 texture_scale = Vector2( 5, 5 )
 polygon = PoolVector2Array( -3, -48, 142, 179, -25, 177 )
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D3"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="rocks/StaticBody2D3"]
 position = Vector2( 1, 0 )
 polygon = PoolVector2Array( -3, -45, -27, 179, 143, 180 )
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="StaticBody2D3"]
+[node name="LightOccluder2D" type="LightOccluder2D" parent="rocks/StaticBody2D3"]
 occluder = SubResource( 22 )
 
-[node name="StaticBody2D4" type="StaticBody2D" parent="." groups=["GROUND"]]
-position = Vector2( 2559, 205 )
-rotation = -0.114333
+[node name="StaticBody2D4" type="StaticBody2D" parent="rocks" groups=["GROUND"]]
+position = Vector2( -1262, -137 )
+rotation = -3.02726
+scale = Vector2( 1, -1 )
 collision_layer = 2
 collision_mask = 65
 
-[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D4"]
+[node name="Polygon2D" type="Polygon2D" parent="rocks/StaticBody2D4"]
 color = Color( 0.854902, 0.854902, 0.854902, 1 )
 antialiased = true
 texture = ExtResource( 21 )
 texture_scale = Vector2( 5, 5 )
 polygon = PoolVector2Array( -3, -48, 142, 179, -25, 177 )
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D4"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="rocks/StaticBody2D4"]
 position = Vector2( 1, 0 )
 polygon = PoolVector2Array( -3, -45, -27, 179, 143, 180 )
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="StaticBody2D4"]
+[node name="LightOccluder2D" type="LightOccluder2D" parent="rocks/StaticBody2D4"]
 occluder = SubResource( 22 )
 
-[node name="StaticBody2D2" type="StaticBody2D" parent="." groups=["GROUND"]]
-position = Vector2( 165, 337 )
+[node name="StaticBody2D2" type="StaticBody2D" parent="rocks" groups=["GROUND"]]
+position = Vector2( 1132, -5 )
+rotation = 3.14159
+scale = Vector2( 1, -1 )
 collision_layer = 2
 collision_mask = 65
 
-[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D2"]
+[node name="Polygon2D" type="Polygon2D" parent="rocks/StaticBody2D2"]
 color = Color( 0.854902, 0.854902, 0.854902, 1 )
 antialiased = true
 texture = ExtResource( 22 )
 texture_scale = Vector2( 5, 5 )
 polygon = PoolVector2Array( -14, 73, 33, 78, 142, 179, -25, 177, -43, 168, -39, 105 )
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D2"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="rocks/StaticBody2D2"]
 position = Vector2( 1, 0 )
 polygon = PoolVector2Array( -14, 73, 33, 78, 142, 179, -25, 177, -43, 168, -39, 105 )
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="StaticBody2D2"]
+[node name="LightOccluder2D" type="LightOccluder2D" parent="rocks/StaticBody2D2"]
 occluder = SubResource( 31 )
 
 [node name="swingpoints" type="Node2D" parent="."]
@@ -629,102 +640,283 @@ position = Vector2( 3350, 37 )
 position = Vector2( -407, -99 )
 
 [node name="player" parent="." instance=ExtResource( 2 )]
-position = Vector2( 430, 406 )
+position = Vector2( 399, 454 )
 camera = NodePath("../camera")
 
-[node name="crate" parent="." instance=ExtResource( 20 )]
-position = Vector2( 507, 459 )
+[node name="objects" type="Node2D" parent="."]
+position = Vector2( 255, 290 )
 
-[node name="crate2" parent="." instance=ExtResource( 20 )]
-position = Vector2( 559, 460 )
+[node name="frogcoins" type="Node2D" parent="objects"]
 
-[node name="crate4" parent="." instance=ExtResource( 20 )]
-position = Vector2( 533, 406 )
+[node name="frogcoin" parent="objects/frogcoins" instance=ExtResource( 3 )]
+position = Vector2( -37, -193 )
 
-[node name="ground1" type="StaticBody2D" parent="." groups=["DIRT", "GROUND"]]
+[node name="frogcoin2" parent="objects/frogcoins" instance=ExtResource( 3 )]
+position = Vector2( 873, -171 )
+
+[node name="frogcoin3" parent="objects/frogcoins" instance=ExtResource( 3 )]
+position = Vector2( 1193, 79 )
+
+[node name="frogcoin4" parent="objects/frogcoins" instance=ExtResource( 3 )]
+position = Vector2( 1837, 161 )
+
+[node name="frogcoin5" parent="objects/frogcoins" instance=ExtResource( 3 )]
+position = Vector2( 2191, 95 )
+
+[node name="butterflies" type="Node2D" parent="objects"]
+
+[node name="butterfly" parent="objects/butterflies" instance=ExtResource( 15 )]
+position = Vector2( 577, 136 )
+rotation = -1.45788
+scale = Vector2( 0.8, 0.8 )
+
+[node name="butterfly2" parent="objects/butterflies" instance=ExtResource( 15 )]
+position = Vector2( 2192, -86 )
+rotation = -2.2487
+scale = Vector2( 0.8, -0.8 )
+
+[node name="butterfly3" parent="objects/butterflies" instance=ExtResource( 15 )]
+position = Vector2( 1282, 29 )
+rotation = 0.560747
+scale = Vector2( 0.75, -0.75 )
+
+[node name="crates" type="Node2D" parent="objects"]
+position = Vector2( 175, 116 )
+
+[node name="crate" parent="objects/crates" instance=ExtResource( 20 )]
+position = Vector2( 77, 53 )
+
+[node name="crate2" parent="objects/crates" instance=ExtResource( 20 )]
+position = Vector2( 129, 54 )
+
+[node name="crate4" parent="objects/crates" instance=ExtResource( 20 )]
+position = Vector2( 103, 0 )
+
+[node name="crate5" parent="objects/crates" instance=ExtResource( 20 )]
+position = Vector2( 757, 20 )
+
+[node name="crate6" parent="objects/crates" instance=ExtResource( 20 )]
+position = Vector2( 607, 20 )
+
+[node name="seesaw" parent="objects" instance=ExtResource( 29 )]
+position = Vector2( 857, 233 )
+
+[node name="rope" type="Node2D" parent="objects"]
+position = Vector2( 1381, 261 )
+script = SubResource( 33 )
+
+[node name="rope" type="Line2D" parent="objects/rope"]
+position = Vector2( 0, 1 )
+points = PoolVector2Array( 0, 0, 100, 0 )
+width = 6.0
+default_color = Color( 1, 1, 1, 1 )
+texture = ExtResource( 32 )
+texture_mode = 1
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="joints" type="Node2D" parent="objects/rope"]
+position = Vector2( -1, -2 )
+
+[node name="PinJoint2D" type="PinJoint2D" parent="objects/rope/joints"]
+position = Vector2( -50.088, -31 )
+node_a = NodePath("../../begin")
+node_b = NodePath("../../segments/0")
+softness = 1.52
+
+[node name="PinJoint2D2" type="PinJoint2D" parent="objects/rope/joints"]
+position = Vector2( 45, -31 )
+node_a = NodePath("../../segments/0")
+node_b = NodePath("../../segments/1")
+softness = 1.52
+
+[node name="PinJoint2D3" type="PinJoint2D" parent="objects/rope/joints"]
+position = Vector2( 133, -31 )
+node_a = NodePath("../../segments/1")
+node_b = NodePath("../../segments/2")
+softness = 1.52
+
+[node name="PinJoint2D4" type="PinJoint2D" parent="objects/rope/joints"]
+position = Vector2( 226, -31 )
+node_a = NodePath("../../segments/2")
+node_b = NodePath("../../segments/3")
+softness = 1.52
+
+[node name="PinJoint2D5" type="PinJoint2D" parent="objects/rope/joints"]
+position = Vector2( 312, -31 )
+node_a = NodePath("../../segments/3")
+node_b = NodePath("../../segments/4")
+softness = 1.52
+
+[node name="PinJoint2D6" type="PinJoint2D" parent="objects/rope/joints"]
+position = Vector2( 400, -31 )
+node_a = NodePath("../../segments/4")
+node_b = NodePath("../../segments/5")
+softness = 1.52
+
+[node name="PinJoint2D7" type="PinJoint2D" parent="objects/rope/joints"]
+position = Vector2( 483, -31 )
+node_a = NodePath("../../segments/5")
+node_b = NodePath("../../end")
+softness = 1.52
+
+[node name="begin" type="StaticBody2D" parent="objects/rope" groups=["GROUND"]]
+position = Vector2( -50, -30 )
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="objects/rope/begin"]
+position = Vector2( -1, -2 )
+shape = SubResource( 34 )
+one_way_collision = true
+
+[node name="segments" type="Node2D" parent="objects/rope"]
+
+[node name="0" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
+position = Vector2( 0, -31 )
+collision_layer = 2
+
+[node name="col" type="CollisionShape2D" parent="objects/rope/segments/0"]
+position = Vector2( 0, -1 )
+shape = SubResource( 35 )
+one_way_collision = true
+
+[node name="1" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
+position = Vector2( 90, -32 )
+collision_layer = 2
+
+[node name="col" type="CollisionShape2D" parent="objects/rope/segments/1"]
+shape = SubResource( 36 )
+one_way_collision = true
+
+[node name="2" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
+position = Vector2( 180, -32 )
+collision_layer = 2
+
+[node name="col" type="CollisionShape2D" parent="objects/rope/segments/2"]
+position = Vector2( 1.25, 0 )
+shape = SubResource( 37 )
+one_way_collision = true
+
+[node name="3" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
+position = Vector2( 270, -32 )
+collision_layer = 2
+
+[node name="col" type="CollisionShape2D" parent="objects/rope/segments/3"]
+shape = SubResource( 38 )
+one_way_collision = true
+
+[node name="4" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
+position = Vector2( 357, -32 )
+collision_layer = 2
+
+[node name="col" type="CollisionShape2D" parent="objects/rope/segments/4"]
+shape = SubResource( 39 )
+one_way_collision = true
+
+[node name="5" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
+position = Vector2( 440, -32 )
+collision_layer = 2
+
+[node name="col" type="CollisionShape2D" parent="objects/rope/segments/5"]
+shape = SubResource( 40 )
+one_way_collision = true
+
+[node name="end" type="StaticBody2D" parent="objects/rope" groups=["GROUND"]]
+position = Vector2( 483, -32 )
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="objects/rope/end"]
+position = Vector2( 1, -1 )
+shape = SubResource( 34 )
+one_way_collision = true
+
+[node name="ground" type="Node2D" parent="."]
+
+[node name="ground1" type="StaticBody2D" parent="ground" groups=["DIRT", "GROUND"]]
 process_priority = 1
 position = Vector2( 2589, 391 )
 collision_layer = 2
 script = ExtResource( 1 )
 
-[node name="grass5" type="Node2D" parent="ground1"]
+[node name="grass5" type="Node2D" parent="ground/ground1"]
 modulate = Color( 0.47451, 0.501961, 0.427451, 1 )
 position = Vector2( -2271, 83 )
 scale = Vector2( 0.445233, 0.33 )
 
-[node name="Grass2" type="Sprite" parent="ground1/grass5"]
+[node name="Grass2" type="Sprite" parent="ground/ground1/grass5"]
 material = SubResource( 25 )
 position = Vector2( 155.941, 35.5131 )
 rotation = 0.0767065
 texture = ExtResource( 19 )
 
-[node name="Grass3" type="Sprite" parent="ground1/grass5"]
+[node name="Grass3" type="Sprite" parent="ground/ground1/grass5"]
 material = SubResource( 25 )
 position = Vector2( -81.9975, 40.0014 )
 rotation = -0.107421
 texture = ExtResource( 19 )
 
-[node name="Grass5" type="Sprite" parent="ground1/grass5"]
+[node name="Grass5" type="Sprite" parent="ground/ground1/grass5"]
 material = SubResource( 25 )
 position = Vector2( 378.303, 48.0598 )
 rotation = 0.173767
 texture = ExtResource( 19 )
 
-[node name="Grass6" type="Sprite" parent="ground1/grass5"]
+[node name="Grass6" type="Sprite" parent="ground/ground1/grass5"]
 material = SubResource( 25 )
 position = Vector2( 612.026, 72.3129 )
 rotation = -0.150747
 texture = ExtResource( 19 )
 
-[node name="Grass4" type="Sprite" parent="ground1/grass5"]
+[node name="Grass4" type="Sprite" parent="ground/ground1/grass5"]
 material = SubResource( 25 )
 position = Vector2( -308.741, 64.2195 )
 rotation = -0.0511743
 texture = ExtResource( 19 )
 
-[node name="grass6" type="Node2D" parent="ground1"]
+[node name="grass6" type="Node2D" parent="ground/ground1"]
 modulate = Color( 0.47451, 0.501961, 0.427451, 1 )
 position = Vector2( -1359, 85 )
 scale = Vector2( 0.445233, 0.33 )
 
-[node name="Grass2" type="Sprite" parent="ground1/grass6"]
+[node name="Grass2" type="Sprite" parent="ground/ground1/grass6"]
 material = SubResource( 25 )
 position = Vector2( 155.941, 35.5131 )
 rotation = 0.0767065
 texture = ExtResource( 19 )
 
-[node name="Grass3" type="Sprite" parent="ground1/grass6"]
+[node name="Grass3" type="Sprite" parent="ground/ground1/grass6"]
 material = SubResource( 25 )
 position = Vector2( -81.9975, 40.0014 )
 rotation = -0.107421
 texture = ExtResource( 19 )
 
-[node name="Grass5" type="Sprite" parent="ground1/grass6"]
+[node name="Grass5" type="Sprite" parent="ground/ground1/grass6"]
 material = SubResource( 25 )
 position = Vector2( 378.303, 48.0598 )
 rotation = 0.173767
 texture = ExtResource( 19 )
 
-[node name="Grass6" type="Sprite" parent="ground1/grass6"]
+[node name="Grass6" type="Sprite" parent="ground/ground1/grass6"]
 material = SubResource( 25 )
 position = Vector2( 612.026, 72.3129 )
 rotation = -0.150747
 texture = ExtResource( 19 )
 
-[node name="Grass4" type="Sprite" parent="ground1/grass6"]
+[node name="Grass4" type="Sprite" parent="ground/ground1/grass6"]
 material = SubResource( 25 )
 position = Vector2( -308.741, 64.2195 )
 rotation = -0.0511743
 texture = ExtResource( 19 )
 
-[node name="Polygon2D" type="Polygon2D" parent="ground1"]
+[node name="Polygon2D" type="Polygon2D" parent="ground/ground1"]
 color = Color( 0.65098, 0.513726, 0.4, 1 )
 antialiased = true
 texture = ExtResource( 23 )
 texture_scale = Vector2( 3, 3 )
 polygon = PoolVector2Array( -2212, 106, -2449, 103, -2473, 104, -2479, 123, -2470, 247, -2492, 386, -2021, 386, -1754, 397, -1240, 407, -1052.65, 392.472, -1002.02, 319.773, -993.367, 218.097, -1001, 116, -1119, 107, -1309, 109, -1438, 111, -1534, 112, -1582.59, 116.21, -1583.31, 131.227, -1571.8, 153.687, -1566, 186, -1599, 195, -1755.32, 209.112, -1880, 199, -1952, 190, -1953, 153, -1936, 124, -1935, 104, -2025, 103, -2122, 107 )
 
-[node name="grassline" type="Line2D" parent="ground1"]
+[node name="grassline" type="Line2D" parent="ground/ground1"]
 position = Vector2( -2468, 99 )
 points = PoolVector2Array( -11, 0, 342, 7, 532, -4 )
 width = 32.0
@@ -734,7 +926,7 @@ texture_mode = 1
 joint_mode = 2
 round_precision = 6
 
-[node name="grassline2" type="Line2D" parent="ground1"]
+[node name="grassline2" type="Line2D" parent="ground/ground1"]
 position = Vector2( -1574, 107 )
 points = PoolVector2Array( -9, 1, 453, -5, 571, 3 )
 width = 32.0
@@ -744,58 +936,58 @@ texture_mode = 1
 joint_mode = 2
 round_precision = 6
 
-[node name="ground2" type="StaticBody2D" parent="." groups=["DIRT", "GROUND"]]
-position = Vector2( 4678, 472 )
+[node name="ground2" type="StaticBody2D" parent="ground" groups=["DIRT", "GROUND"]]
+position = Vector2( 4778, 451 )
 collision_layer = 2
 script = ExtResource( 1 )
 
-[node name="grass3" type="Node2D" parent="ground2"]
+[node name="grass3" type="Node2D" parent="ground/ground2"]
 modulate = Color( 0.47451, 0.501961, 0.427451, 1 )
 position = Vector2( -2306, 70 )
 rotation = -0.00475921
 scale = Vector2( 0.5, 0.33 )
 
-[node name="Grass2" type="Sprite" parent="ground2/grass3"]
+[node name="Grass2" type="Sprite" parent="ground/ground2/grass3"]
 material = SubResource( 25 )
 position = Vector2( 155.941, 35.5131 )
 rotation = 0.0767065
 texture = ExtResource( 19 )
 
-[node name="Grass3" type="Sprite" parent="ground2/grass3"]
+[node name="Grass3" type="Sprite" parent="ground/ground2/grass3"]
 material = SubResource( 25 )
 position = Vector2( -81.9975, 40.0014 )
 rotation = -0.107421
 texture = ExtResource( 19 )
 
-[node name="Grass5" type="Sprite" parent="ground2/grass3"]
+[node name="Grass5" type="Sprite" parent="ground/ground2/grass3"]
 material = SubResource( 25 )
 position = Vector2( 378.303, 48.0598 )
 rotation = 0.173767
 texture = ExtResource( 19 )
 
-[node name="Grass6" type="Sprite" parent="ground2/grass3"]
+[node name="Grass6" type="Sprite" parent="ground/ground2/grass3"]
 material = SubResource( 25 )
 position = Vector2( 612.026, 72.3129 )
 rotation = -0.150747
 texture = ExtResource( 19 )
 
-[node name="Grass4" type="Sprite" parent="ground2/grass3"]
+[node name="Grass4" type="Sprite" parent="ground/ground2/grass3"]
 material = SubResource( 25 )
 position = Vector2( -308.741, 64.2195 )
 rotation = -0.0511743
 texture = ExtResource( 19 )
 
-[node name="Polygon2D" type="Polygon2D" parent="ground2"]
+[node name="Polygon2D" type="Polygon2D" parent="ground/ground2"]
 color = Color( 0.65098, 0.513726, 0.4, 1 )
 antialiased = true
 texture = ExtResource( 23 )
 texture_scale = Vector2( 3, 3 )
-polygon = PoolVector2Array( -2208, 92, -2443, 85, -2514, 82, -2522, 106, -2510.53, 229.085, -1940, 218, -1934.38, 164.391, -1929.48, 121.672, -1947, 96, -2051, 91 )
+polygon = PoolVector2Array( -2208, 92, -2443, 85, -2514, 82, -2577, 59, -2664, 54, -2668, 94, -2661, 235, -2512, 264, -1940, 218, -1934.38, 164.391, -1929.48, 121.672, -1947, 96, -2051, 91 )
 
-[node name="grassline3" type="Line2D" parent="ground2"]
+[node name="grassline3" type="Line2D" parent="ground/ground2"]
 position = Vector2( -2522.64, 10.2737 )
 rotation = 0.114333
-points = PoolVector2Array( 9.2749, 75.1589, 225.086, 52.3896, 519.61, 22.5945, 584.528, 18.1595 )
+points = PoolVector2Array( -139.081, 63.0045, -44.0493, 49.072, 21.8145, 61.6401, 225.086, 52.3896, 519.61, 22.5945, 584.528, 18.1595 )
 width = 32.0
 default_color = Color( 0.419608, 0.619608, 0.25098, 1 )
 texture = ExtResource( 24 )
@@ -803,98 +995,98 @@ texture_mode = 1
 joint_mode = 2
 round_precision = 6
 
-[node name="ground3" type="StaticBody2D" parent="." groups=["DIRT", "GROUND"]]
+[node name="ground3" type="StaticBody2D" parent="ground" groups=["DIRT", "GROUND"]]
 position = Vector2( 5932, 225 )
 rotation = -0.120975
 collision_layer = 2
 script = ExtResource( 1 )
 
-[node name="grass3" type="Node2D" parent="ground3"]
+[node name="grass3" type="Node2D" parent="ground/ground3"]
 modulate = Color( 0.47451, 0.501961, 0.427451, 1 )
 position = Vector2( -2208.39, 22.9257 )
 rotation = 0.114333
 scale = Vector2( 0.5, 0.33 )
 
-[node name="Grass2" type="Sprite" parent="ground3/grass3"]
+[node name="Grass2" type="Sprite" parent="ground/ground3/grass3"]
 material = SubResource( 25 )
 position = Vector2( 155.941, 35.5131 )
 rotation = 0.0767065
 texture = ExtResource( 19 )
 
-[node name="Grass3" type="Sprite" parent="ground3/grass3"]
+[node name="Grass3" type="Sprite" parent="ground/ground3/grass3"]
 material = SubResource( 25 )
 position = Vector2( -81.9975, 40.0014 )
 rotation = -0.107421
 texture = ExtResource( 19 )
 
-[node name="Grass5" type="Sprite" parent="ground3/grass3"]
+[node name="Grass5" type="Sprite" parent="ground/ground3/grass3"]
 material = SubResource( 25 )
 position = Vector2( 378.303, 48.0598 )
 rotation = 0.173767
 texture = ExtResource( 19 )
 
-[node name="Grass6" type="Sprite" parent="ground3/grass3"]
+[node name="Grass6" type="Sprite" parent="ground/ground3/grass3"]
 material = SubResource( 25 )
 position = Vector2( 612.026, 72.3129 )
 rotation = -0.150747
 texture = ExtResource( 19 )
 
-[node name="Grass4" type="Sprite" parent="ground3/grass3"]
+[node name="Grass4" type="Sprite" parent="ground/ground3/grass3"]
 material = SubResource( 25 )
 position = Vector2( -308.741, 64.2195 )
 rotation = -0.0511743
 texture = ExtResource( 19 )
 
-[node name="Grass7" type="Sprite" parent="ground3/grass3"]
+[node name="Grass7" type="Sprite" parent="ground/ground3/grass3"]
 material = SubResource( 25 )
 position = Vector2( -490.44, 72.8862 )
 rotation = -0.0511743
 texture = ExtResource( 19 )
 
-[node name="grass4" type="Node2D" parent="ground3"]
+[node name="grass4" type="Node2D" parent="ground/ground3"]
 modulate = Color( 0.47451, 0.501961, 0.427451, 1 )
 position = Vector2( -2095.59, -321.515 )
 rotation = 0.150588
 scale = Vector2( 0.5, 0.33 )
 
-[node name="Grass2" type="Sprite" parent="ground3/grass4"]
+[node name="Grass2" type="Sprite" parent="ground/ground3/grass4"]
 material = SubResource( 25 )
 position = Vector2( 155.941, 35.5131 )
 rotation = 0.0767065
 texture = ExtResource( 19 )
 
-[node name="Grass3" type="Sprite" parent="ground3/grass4"]
+[node name="Grass3" type="Sprite" parent="ground/ground3/grass4"]
 material = SubResource( 25 )
 position = Vector2( -81.9975, 40.0014 )
 rotation = -0.107421
 texture = ExtResource( 19 )
 
-[node name="Grass5" type="Sprite" parent="ground3/grass4"]
+[node name="Grass5" type="Sprite" parent="ground/ground3/grass4"]
 material = SubResource( 25 )
 position = Vector2( 342.624, 51.7474 )
 rotation = 0.173767
 texture = ExtResource( 19 )
 
-[node name="Grass4" type="Sprite" parent="ground3/grass4"]
+[node name="Grass4" type="Sprite" parent="ground/ground3/grass4"]
 material = SubResource( 25 )
 position = Vector2( -308.741, 64.2195 )
 rotation = -0.0511743
 texture = ExtResource( 19 )
 
-[node name="Grass7" type="Sprite" parent="ground3/grass4"]
+[node name="Grass7" type="Sprite" parent="ground/ground3/grass4"]
 material = SubResource( 25 )
 position = Vector2( -490.44, 72.8862 )
 rotation = -0.0511743
 texture = ExtResource( 19 )
 
-[node name="Polygon2D" type="Polygon2D" parent="ground3"]
+[node name="Polygon2D" type="Polygon2D" parent="ground/ground3"]
 color = Color( 0.65098, 0.513726, 0.4, 1 )
 antialiased = true
 texture = ExtResource( 23 )
 texture_scale = Vector2( 3, 3 )
 polygon = PoolVector2Array( -2207.79, 38.3766, -2454.63, 14.0576, -2524.97, 13.0261, -2534.74, 28.0089, -2517.47, 105.485, -2510.53, 229.085, -1958.3, 302.564, -1875.18, 192.327, -1837.39, 126.207, -1839.85, 103.78, -1868.32, 97.491, -1969.66, 85.8544, -1968.8, -175.757, -1875, -247.524, -1867.95, -273.891, -2151.09, -306.405, -2405.08, -338.591, -2409.72, -306.914, -2368, -240.722, -2041.25, -176.023, -2045.08, -63.7273, -2162.86, 41.5235 )
 
-[node name="grassline3" type="Line2D" parent="ground3"]
+[node name="grassline3" type="Line2D" parent="ground/ground3"]
 position = Vector2( -2523.57, 11.8639 )
 rotation = 0.114333
 points = PoolVector2Array( -9, -1, 216, -10, 370, -14 )
@@ -905,7 +1097,7 @@ texture_mode = 1
 joint_mode = 2
 round_precision = 6
 
-[node name="grassline4" type="Line2D" parent="ground3"]
+[node name="grassline4" type="Line2D" parent="ground/ground3"]
 position = Vector2( -1960.08, 83.618 )
 rotation = 0.114333
 points = PoolVector2Array( -9, -1, 126, 2.00012 )
@@ -916,7 +1108,7 @@ texture_mode = 1
 joint_mode = 2
 round_precision = 6
 
-[node name="grassline5" type="Line2D" parent="ground3"]
+[node name="grassline5" type="Line2D" parent="ground/ground3"]
 position = Vector2( -2395.84, -337.848 )
 rotation = 0.114333
 points = PoolVector2Array( -10.0002, -1.99997, 533, 1.00003 )
@@ -927,62 +1119,26 @@ texture_mode = 1
 joint_mode = 2
 round_precision = 6
 
-[node name="frogcoins" type="Node2D" parent="."]
-position = Vector2( 255, 290 )
-
-[node name="frogcoin" parent="frogcoins" instance=ExtResource( 3 )]
-position = Vector2( -37, -193 )
-
-[node name="frogcoin2" parent="frogcoins" instance=ExtResource( 3 )]
-position = Vector2( 873, -171 )
-
-[node name="frogcoin3" parent="frogcoins" instance=ExtResource( 3 )]
-position = Vector2( 1193, 79 )
-
-[node name="frogcoin4" parent="frogcoins" instance=ExtResource( 3 )]
-position = Vector2( 1837, 161 )
-
-[node name="frogcoin5" parent="frogcoins" instance=ExtResource( 3 )]
-position = Vector2( 2191, 95 )
-
-[node name="butterfly" parent="." instance=ExtResource( 15 )]
-position = Vector2( 832, 426 )
-rotation = -1.45788
-scale = Vector2( 0.8, 0.8 )
-
-[node name="butterfly2" parent="." instance=ExtResource( 15 )]
-position = Vector2( 2447, 204 )
-rotation = 0.892889
-scale = Vector2( -0.8, 0.8 )
-
-[node name="butterfly3" parent="." instance=ExtResource( 15 )]
-position = Vector2( 1537, 319 )
-rotation = 3.70234
-scale = Vector2( -0.75, 0.75 )
-
-[node name="water" type="CanvasLayer" parent="."]
-layer = 2
-follow_viewport_enable = true
-
-[node name="water2" type="Sprite" parent="water"]
+[node name="water" type="Sprite" parent="."]
 material = SubResource( 13 )
-position = Vector2( -980, 596 )
+position = Vector2( -980, 602 )
 scale = Vector2( 22.6719, 2.31641 )
 texture = ExtResource( 8 )
 normal_map = ExtResource( 7 )
 centered = false
 script = ExtResource( 10 )
 
-[node name="water_area" type="Area2D" parent="water/water2"]
+[node name="water_area" type="Area2D" parent="water"]
 position = Vector2( 127.299, 148.777 )
 collision_layer = 0
 collision_mask = 33
 script = SubResource( 27 )
 
-[node name="col" type="CollisionShape2D" parent="water/water2/water_area"]
+[node name="col" type="CollisionShape2D" parent="water/water_area"]
 position = Vector2( 0.967445, 6.79352 )
 shape = SubResource( 26 )
 
-[connection signal="body_exited" from="playarea" to="playarea" method="_on_playarea_body_exited"]
-[connection signal="timeout" from="playarea/timer" to="playarea" method="_on_timer_timeout"]
-[connection signal="body_entered" from="water/water2/water_area" to="water/water2/water_area" method="_on_water_area_body_entered"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 32 )
+
+[connection signal="body_entered" from="water/water_area" to="water/water_area" method="_on_water_area_body_entered"]

@@ -1,7 +1,8 @@
 #TODO cotton stuffing comes out on death
 #TODO lerp lifting the box on head
 #TODO sometimes when frog jumps with box from ends then starts rolling and loses box
-
+#TODO drawing in _process and game logic in _physics_process/_integrate_forces
+#TODO weird jumps when hitting ceilings
 
 extends RigidBody2D
 
@@ -126,29 +127,28 @@ func _integrate_forces(state):
 				break
 
 
-	if Input.is_action_just_pressed("move_jump"):
-		
-		if anchor:
-			var dist = tongue_begin.distance_to(anchor.get_global_transform().origin - get_parent().get_global_transform().origin)
-			if dist < SWING_POINT_DISTANCE and not tongue_ray.is_colliding():
-				if $swing_cooldown.is_stopped():
-					swinging = true
-					$swing_cooldown.start()
-					anchor.get_node("swish").play()
+	if Input.is_action_just_pressed("move_grapple"):
+				if anchor:
+					var dist = tongue_begin.distance_to(anchor.get_global_transform().origin - get_parent().get_global_transform().origin)
+					if dist < SWING_POINT_DISTANCE and not tongue_ray.is_colliding():
+						if $swing_cooldown.is_stopped():
+							swinging = true
+							$swing_cooldown.start()
+							anchor.get_node("swish").play()
+						else:
+							if get_mode() == RigidBody2D.MODE_CHARACTER && groundray.is_colliding() && \
+							abs(state.transform.get_rotation()) < 0.1:
+								if not jumping:
+									$jump_timer.start()
+									jumping = true
 				else:
-					if get_mode() == RigidBody2D.MODE_CHARACTER && groundray.is_colliding() && \
+					if get_mode() == RigidBody2D.MODE_CHARACTER && groundray.is_colliding() &&\
 					abs(state.transform.get_rotation()) < 0.1:
 						if not jumping:
 							$jump_timer.start()
 							jumping = true
-		else:
-			if get_mode() == RigidBody2D.MODE_CHARACTER && groundray.is_colliding() &&\
-			abs(state.transform.get_rotation()) < 0.1:
-				if not jumping:
-					$jump_timer.start()
-					jumping = true
-	
-	if Input.is_action_just_released("move_jump"):
+		
+	if Input.is_action_just_released("move_grapple"):
 		if not swinging:
 			$swing_cooldown.stop()
 		swinging = false
@@ -156,6 +156,13 @@ func _integrate_forces(state):
 			anchor = second_anchor
 			second_anchor = null
 	
+	if Input.is_action_just_pressed("move_jump"):
+		if get_mode() == RigidBody2D.MODE_CHARACTER && groundray.is_colliding() &&\
+		abs(state.transform.get_rotation()) < 0.1:
+			if not jumping:
+				$jump_timer.start()
+				jumping = true
+			
 
 	if not swinging:
 		if canmove:
@@ -165,10 +172,9 @@ func _integrate_forces(state):
 					if not $footstep.is_playing() and not rolling and abs(state.transform.get_rotation()) < 0.1:
 						$footstep.play()
 					if not dust.is_emitting(): dust.set_emitting(true)
+				else:
+					if dust.is_emitting(): dust.set_emitting(false)
 			
-		if ceilingray.is_colliding() and jumping and not held_object:
-			jumping = false
-		
 		
 		if groundray.is_colliding() and not jumping:
 			canmove = true
@@ -211,6 +217,9 @@ func _integrate_forces(state):
 				motion.x = lerp(motion.x, _SPEED * sign(l), ACCELERATION_FACTOR)
 				rolling = true
 
+	if ceilingray.is_colliding() and not held_object:
+		jumping = false
+	
 	
 	if swing:
 		if swinging:
@@ -257,7 +266,7 @@ func _integrate_forces(state):
 				
 	
 	if Input.is_action_just_pressed("move_dance"):
-		if not abs(state.transform.get_rotation()) >= 0.1:
+		if not abs(state.transform.get_rotation()) >= 0.1 and not held_object:
 			dancing = true
 			tongue.hide()
 			$sprite.animation = "dance"
@@ -319,7 +328,7 @@ func _integrate_forces(state):
 	
 	#TODO SET SIZE OF EXTENTS OF SWING_ZONE SWING COL TO SWING_POINT_DISTANCE
 	if direction: swing_zone_turn = direction
-	$swing_zone.set_position(Vector2((SWING_POINT_DISTANCE - 100) * swing_zone_turn,0))
+	$swing_zone.set_position(Vector2((SWING_POINT_DISTANCE - 50) * swing_zone_turn,0))
 	
 	state.set_linear_velocity(motion)
 	
