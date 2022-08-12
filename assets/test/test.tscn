@@ -1,4 +1,4 @@
-[gd_scene load_steps=60 format=2]
+[gd_scene load_steps=51 format=2]
 
 [ext_resource path="res://assets/scripts/polyfill.gd" type="Script" id=1]
 [ext_resource path="res://assets/froggie/player.tscn" type="PackedScene" id=2]
@@ -31,7 +31,7 @@
 [ext_resource path="res://assets/objects/seesaw.tscn" type="PackedScene" id=29]
 [ext_resource path="res://assets/controls/playarea.tscn" type="PackedScene" id=30]
 [ext_resource path="res://assets/environment/trees/16.png" type="Texture" id=31]
-[ext_resource path="res://assets/objects/rope_texture.png" type="Texture" id=32]
+[ext_resource path="res://assets/objects/rope.tscn" type="PackedScene" id=32]
 
 [sub_resource type="GDScript" id=24]
 script/source = "extends CanvasLayer
@@ -144,44 +144,6 @@ polygon = PoolVector2Array( -1, -42, -27, 179, 143, 180 )
 [sub_resource type="OccluderPolygon2D" id=31]
 polygon = PoolVector2Array( -14, 73, 33, 78, 142, 179, -25, 177, -43, 168, -39, 105 )
 
-[sub_resource type="GDScript" id=33]
-script/source = "extends Node2D
-	
-func _process(delta):
-	var list = []
-	
-	list.append($begin.get_position())
-	
-	for segment in $segments.get_children():
-		list.append($segments.get_position() + segment.get_position())
-	
-	list.append($end.get_position())
-	
-	$rope.set_points(list)
-
-"
-
-[sub_resource type="CircleShape2D" id=34]
-radius = 7.0
-
-[sub_resource type="RectangleShape2D" id=35]
-extents = Vector2( 51.5, 6 )
-
-[sub_resource type="RectangleShape2D" id=36]
-extents = Vector2( 49, 6 )
-
-[sub_resource type="RectangleShape2D" id=37]
-extents = Vector2( 50.25, 6 )
-
-[sub_resource type="RectangleShape2D" id=38]
-extents = Vector2( 49.5, 6 )
-
-[sub_resource type="RectangleShape2D" id=39]
-extents = Vector2( 50, 6 )
-
-[sub_resource type="RectangleShape2D" id=40]
-extents = Vector2( 47, 6 )
-
 [sub_resource type="ShaderMaterial" id=25]
 shader = ExtResource( 18 )
 shader_param/speed = 2.552
@@ -216,7 +178,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 0.66742
+shader_param/zoom_y = 1.05946
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -237,10 +199,6 @@ func _on_water_area_body_entered(body):
 [sub_resource type="RectangleShape2D" id=26]
 extents = Vector2( 128.819, 118.206 )
 
-[sub_resource type="Environment" id=32]
-adjustment_enabled = true
-adjustment_brightness = 8.0
-
 [node name="test" type="Node2D"]
 
 [node name="HUD" type="CanvasLayer" parent="."]
@@ -251,12 +209,12 @@ script = SubResource( 24 )
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 309.0
-margin_bottom = 263.0
+margin_bottom = 279.0
 size_flags_horizontal = 9
 
 [node name="panel" type="Panel" parent="HUD/MarginContainer"]
 margin_right = 289.0
-margin_bottom = 243.0
+margin_bottom = 259.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -269,7 +227,7 @@ anchor_bottom = 1.0
 margin_left = 10.0
 margin_top = 10.0
 margin_right = -10.0
-margin_bottom = 14.0
+margin_bottom = 7.0
 size_flags_horizontal = 3
 custom_colors/default_color = Color( 1, 1, 1, 1 )
 bbcode_enabled = true
@@ -281,6 +239,7 @@ Press T: toggle this display
 Hold A,D = run left, run right
 Hold Shift = increase speed
 Hold W = tongue grapple/jump
+Press Space = jump
 Hold S = roll
 press Q = dance
 Press R = restart
@@ -294,6 +253,7 @@ Press T: toggle this display
 Hold A,D = run left, run right
 Hold Shift = increase speed
 Hold W = tongue grapple/jump
+Press Space = jump
 Hold S = roll
 press Q = dance
 Press R = restart
@@ -326,7 +286,7 @@ bus = "SFX"
 
 [node name="camera" type="Camera2D" parent="."]
 current = true
-zoom = Vector2( 1.2, 1.2 )
+zoom = Vector2( 1.33, 1.33 )
 limit_left = -500
 limit_top = -500
 limit_right = 4500
@@ -375,9 +335,9 @@ texture = ExtResource( 11 )
 centered = false
 
 [node name="sun" type="Light2D" parent="."]
-position = Vector2( 0, -8 )
+position = Vector2( 738, -63 )
 texture = ExtResource( 14 )
-texture_scale = 3.5
+texture_scale = 9.86
 color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
 energy = 1.5
 shadow_enabled = true
@@ -701,135 +661,8 @@ position = Vector2( 607, 20 )
 [node name="seesaw" parent="objects" instance=ExtResource( 29 )]
 position = Vector2( 857, 233 )
 
-[node name="rope" type="Node2D" parent="objects"]
-position = Vector2( 1381, 261 )
-script = SubResource( 33 )
-
-[node name="rope" type="Line2D" parent="objects/rope"]
-position = Vector2( 0, 1 )
-points = PoolVector2Array( 0, 0, 100, 0 )
-width = 6.0
-default_color = Color( 1, 1, 1, 1 )
-texture = ExtResource( 32 )
-texture_mode = 1
-joint_mode = 2
-begin_cap_mode = 2
-end_cap_mode = 2
-
-[node name="joints" type="Node2D" parent="objects/rope"]
-position = Vector2( -1, -2 )
-
-[node name="PinJoint2D" type="PinJoint2D" parent="objects/rope/joints"]
-position = Vector2( -50.088, -31 )
-node_a = NodePath("../../begin")
-node_b = NodePath("../../segments/0")
-softness = 1.52
-
-[node name="PinJoint2D2" type="PinJoint2D" parent="objects/rope/joints"]
-position = Vector2( 45, -31 )
-node_a = NodePath("../../segments/0")
-node_b = NodePath("../../segments/1")
-softness = 1.52
-
-[node name="PinJoint2D3" type="PinJoint2D" parent="objects/rope/joints"]
-position = Vector2( 133, -31 )
-node_a = NodePath("../../segments/1")
-node_b = NodePath("../../segments/2")
-softness = 1.52
-
-[node name="PinJoint2D4" type="PinJoint2D" parent="objects/rope/joints"]
-position = Vector2( 226, -31 )
-node_a = NodePath("../../segments/2")
-node_b = NodePath("../../segments/3")
-softness = 1.52
-
-[node name="PinJoint2D5" type="PinJoint2D" parent="objects/rope/joints"]
-position = Vector2( 312, -31 )
-node_a = NodePath("../../segments/3")
-node_b = NodePath("../../segments/4")
-softness = 1.52
-
-[node name="PinJoint2D6" type="PinJoint2D" parent="objects/rope/joints"]
-position = Vector2( 400, -31 )
-node_a = NodePath("../../segments/4")
-node_b = NodePath("../../segments/5")
-softness = 1.52
-
-[node name="PinJoint2D7" type="PinJoint2D" parent="objects/rope/joints"]
-position = Vector2( 483, -31 )
-node_a = NodePath("../../segments/5")
-node_b = NodePath("../../end")
-softness = 1.52
-
-[node name="begin" type="StaticBody2D" parent="objects/rope" groups=["GROUND"]]
-position = Vector2( -50, -30 )
-collision_layer = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="objects/rope/begin"]
-position = Vector2( -1, -2 )
-shape = SubResource( 34 )
-one_way_collision = true
-
-[node name="segments" type="Node2D" parent="objects/rope"]
-
-[node name="0" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
-position = Vector2( 0, -31 )
-collision_layer = 2
-
-[node name="col" type="CollisionShape2D" parent="objects/rope/segments/0"]
-position = Vector2( 0, -1 )
-shape = SubResource( 35 )
-one_way_collision = true
-
-[node name="1" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
-position = Vector2( 90, -32 )
-collision_layer = 2
-
-[node name="col" type="CollisionShape2D" parent="objects/rope/segments/1"]
-shape = SubResource( 36 )
-one_way_collision = true
-
-[node name="2" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
-position = Vector2( 180, -32 )
-collision_layer = 2
-
-[node name="col" type="CollisionShape2D" parent="objects/rope/segments/2"]
-position = Vector2( 1.25, 0 )
-shape = SubResource( 37 )
-one_way_collision = true
-
-[node name="3" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
-position = Vector2( 270, -32 )
-collision_layer = 2
-
-[node name="col" type="CollisionShape2D" parent="objects/rope/segments/3"]
-shape = SubResource( 38 )
-one_way_collision = true
-
-[node name="4" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
-position = Vector2( 357, -32 )
-collision_layer = 2
-
-[node name="col" type="CollisionShape2D" parent="objects/rope/segments/4"]
-shape = SubResource( 39 )
-one_way_collision = true
-
-[node name="5" type="RigidBody2D" parent="objects/rope/segments" groups=["GROUND"]]
-position = Vector2( 440, -32 )
-collision_layer = 2
-
-[node name="col" type="CollisionShape2D" parent="objects/rope/segments/5"]
-shape = SubResource( 40 )
-one_way_collision = true
-
-[node name="end" type="StaticBody2D" parent="objects/rope" groups=["GROUND"]]
-position = Vector2( 483, -32 )
-collision_layer = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="objects/rope/end"]
-position = Vector2( 1, -1 )
-shape = SubResource( 34 )
-one_way_collision = true
+[node name="rope" parent="objects" instance=ExtResource( 32 )]
+position = Vector2( 1325, 227 )
 
 [node name="ground" type="Node2D" parent="."]
 
@@ -1137,8 +970,5 @@ script = SubResource( 27 )
 [node name="col" type="CollisionShape2D" parent="water/water_area"]
 position = Vector2( 0.967445, 6.79352 )
 shape = SubResource( 26 )
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource( 32 )
 
 [connection signal="body_entered" from="water/water_area" to="water/water_area" method="_on_water_area_body_entered"]

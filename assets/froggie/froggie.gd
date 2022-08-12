@@ -3,6 +3,7 @@
 #TODO sometimes when frog jumps with box from ends then starts rolling and loses box
 #TODO drawing in _process and game logic in _physics_process/_integrate_forces
 #TODO weird jumps when hitting ceilings
+#TODO make froggie heavier when he's holding objects
 
 extends RigidBody2D
 
