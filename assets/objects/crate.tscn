@@ -28,8 +28,8 @@ polygon = PoolVector2Array( -25, -25, 25, -25, 25, 25, -25, 25 )
 [node name="crate" type="RigidBody2D" groups=["GROUND", "OBJECT"]]
 position = Vector2( 533, 396 )
 collision_layer = 32
-collision_mask = 35
-mass = 5.0
+collision_mask = 291
+mass = 3.0
 gravity_scale = 5.0
 script = SubResource( 30 )
 

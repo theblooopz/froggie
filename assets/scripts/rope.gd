@@ -1,11 +1,9 @@
 extends Node2D
 
-
-
-export onready var JOINT_SOFTNESS = 0.7
-export onready var SEGMENT_WIDTH = 32
-export onready var LINE_WIDTH = 6
-export onready var SEGMENT_HEIGHT = 4
+export(float) var JOINT_SOFTNESS = 0.7
+export(int) var SEGMENT_WIDTH = 32
+export(int) var LINE_WIDTH = 6
+export(int) var SEGMENT_HEIGHT = 4
 
 
 func _ready():
@@ -24,12 +22,12 @@ func _ready():
 		var rb = RigidBody2D.new()
 		rb.name = str(segn)
 		rb.set_position(Vector2( (SEGMENT_WIDTH)*(segn) + SEGMENT_WIDTH/2,0))
-		rb.add_to_group("GROUND")
+		rb.add_to_group("ROPE")
 		rb.set_collision_layer_bit(0, false)
 		rb.set_collision_layer_bit(7, true)
 		#rb.set_collision_layer_bit(1,true)
 		rb.set_collision_mask_bit(0, true)
-		rb.set_collision_mask_bit(1, true)
+		rb.set_collision_mask_bit(1, false)
 		#rb.set_collision_mask_bit(5, true)
 		var col = CollisionShape2D.new()
 		var j = PinJoint2D.new()

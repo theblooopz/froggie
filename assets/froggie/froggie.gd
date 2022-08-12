@@ -4,6 +4,7 @@
 #TODO drawing in _process and game logic in _physics_process/_integrate_forces
 #TODO weird jumps when hitting ceilings
 #TODO make froggie heavier when he's holding objects
+#TODO weird little bounce when bouncing on mushroom with crate
 
 extends RigidBody2D
 
@@ -15,6 +16,9 @@ const ACCELERATION_FACTOR = 0.8
 const SWING_POWER = 9
 const SWING_POINT_DISTANCE = 400
 const ROLL_SPEED = 15
+
+
+const FROGGIE_MASS = 1
 
 
 var _SPEED = SPEED
@@ -47,11 +51,27 @@ onready var held_object = null
 
 var anchors = []
 
+var contacts = {
+				ground_contact = false,
+				rope_contact = false
+			}
+
 var rolling = false
 var initial_swing = true
 
 func _ready():
 	$death_timer.stop()
+
+func jump(state):
+	
+		if get_mode() == RigidBody2D.MODE_CHARACTER &&\
+		abs(state.transform.get_rotation()) < 0.1:
+			if not jumping:
+				if groundray.is_colliding() or contacts.rope_contact:
+					if not groundray.get_collider().is_in_group("BOUNCE"):
+						$jump_timer.start()
+						jumping = true
+						
 
 func _integrate_forces(state):
 	
@@ -137,17 +157,9 @@ func _integrate_forces(state):
 							$swing_cooldown.start()
 							anchor.get_node("swish").play()
 						else:
-							if get_mode() == RigidBody2D.MODE_CHARACTER && groundray.is_colliding() && \
-							abs(state.transform.get_rotation()) < 0.1:
-								if not jumping:
-									$jump_timer.start()
-									jumping = true
+							jump(state)
 				else:
-					if get_mode() == RigidBody2D.MODE_CHARACTER && groundray.is_colliding() &&\
-					abs(state.transform.get_rotation()) < 0.1:
-						if not jumping:
-							$jump_timer.start()
-							jumping = true
+					jump(state)
 		
 	if Input.is_action_just_released("move_grapple"):
 		if not swinging:
@@ -158,11 +170,7 @@ func _integrate_forces(state):
 			second_anchor = null
 	
 	if Input.is_action_just_pressed("move_jump"):
-		if get_mode() == RigidBody2D.MODE_CHARACTER && groundray.is_colliding() &&\
-		abs(state.transform.get_rotation()) < 0.1:
-			if not jumping:
-				$jump_timer.start()
-				jumping = true
+		jump(state)
 			
 
 	if not swinging:
@@ -176,23 +184,30 @@ func _integrate_forces(state):
 				else:
 					if dust.is_emitting(): dust.set_emitting(false)
 			
+		var flag = false
 		
 		if groundray.is_colliding() and not jumping:
 			canmove = true
-			#var gnl = groundray.get_collision_normal()
-			motion.y = 0
-			motion.y += motion.x  * cos(groundray.get_collision_normal().angle())
+			var grb = groundray.get_collider()
+			if grb.is_in_group("ROPE"): flag = true
+			if grb.is_in_group("BOUNCE") and grb.has_method("get_bounce_power"):
+				motion.y = grb.get_bounce_power()
+			elif not flag:
+				motion.y = 0
+				motion.y += motion.x  * cos(groundray.get_collision_normal().angle())
+		
 		else:
-				
+			
 			var bodies = get_colliding_bodies()
-			var ground_contact = false
+			contacts.ground_contact = false
+			contacts.rope_contact = false
 			#var ceiling_contact = true
 			var l = 0
 			var idx = 0
 			var a = 0
 			var v = 0
 			for body in bodies:
-				if body.is_in_group("GROUND")and state.get_contact_count() > 0:
+				if body.is_in_group("GROUND") and state.get_contact_count() > 0:
 					
 					if state.get_contact_count() > idx:
 						l = state.get_contact_local_normal(idx).x
@@ -200,23 +215,37 @@ func _integrate_forces(state):
 						a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
 					
 					if v < 0:
-						ground_contact = true
-						break
+						contacts.ground_contact = true
+				
+				if body.is_in_group("ROPE") and state.get_contact_count() > 0:
+					
+					if state.get_contact_count() > idx:
+						l = state.get_contact_local_normal(idx).x
+						v = state.get_contact_local_normal(idx).y
+						a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
+					
+					if v < 0:
+						contacts.rope_contact= true
+						
 				idx += 1
 			
 			if a > 100:
 				canmove = false
 
 			
-			if not ground_contact and not jumping:
+			if not contacts.ground_contact and not jumping:
 				motion.y += GRAVITY
-			if jumping:
+			if jumping: 
 				canmove = true
 				motion.y -= JUMP_FORCE
 			
-			if ground_contact and not jumping:
+			if contacts.ground_contact and not jumping:
 				motion.x = lerp(motion.x, _SPEED * sign(l), ACCELERATION_FACTOR)
 				rolling = true
+			
+			if contacts.rope_contact and not jumping:
+				motion.y = 0
+				canmove = true
 
 	if ceilingray.is_colliding() and not held_object:
 		jumping = false
@@ -271,11 +300,11 @@ func _integrate_forces(state):
 			dancing = true
 			tongue.hide()
 			$sprite.animation = "dance"
-	
-	
+
+
 	if not groundray.is_colliding():
 		$sprite.animation = "air"
-	
+
 	
 	if direction:
 		if direction < 0:
@@ -289,9 +318,11 @@ func _integrate_forces(state):
 				if abs(state.transform.get_rotation()) < 0.1:
 					var obj = holdray.get_collider()
 					if obj.is_in_group("OBJECT"):
+						obj.set_collision_mask_bit(8, false)
 						obj.custom_integrator = true
 						obj.set_angular_velocity(0)
 						obj.set_linear_velocity(Vector2.ZERO)
+						set_mass(obj.get_mass() + FROGGIE_MASS)
 						held_object = obj
 						$hold.set_remote_node(obj.get_path())
 		else:
@@ -304,9 +335,10 @@ func _integrate_forces(state):
 
 			held_object.set_linear_velocity(vl)
 			held_object.set_angular_velocity(al)
-			
+			held_object.set_collision_mask_bit(8, true)
 			held_object.custom_integrator = false
 			held_object.set_sleeping(false)
+			set_mass(FROGGIE_MASS)
 			held_object = null
 			$hold.set_remote_node("")
 	
@@ -316,13 +348,17 @@ func _integrate_forces(state):
 	
 		if abs(state.transform.get_rotation()) > 0.1:
 			held_object.custom_integrator = false
+			held_object.set_collision_mask_bit(8, true)
 			held_object.set_sleeping(false)
+			set_mass(FROGGIE_MASS)
 			held_object = null
 			$hold.set_remote_node("")
 	
 	if rolling and held_object:
+		held_object.set_collision_mask_bit(8, true)
 		held_object.custom_integrator = false
 		held_object.set_sleeping(false)
+		set_mass(FROGGIE_MASS)
 		held_object = null
 		$hold.set_remote_node("")
 	

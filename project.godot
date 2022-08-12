@@ -114,6 +114,7 @@ move_jump={
 2d_physics/layer_6="Object"
 2d_physics/layer_7="Tongue"
 2d_physics/layer_8="Rope"
+2d_physics/layer_9="Mushroom"
 
 [physics]
 
