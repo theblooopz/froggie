@@ -35,3 +35,4 @@ polygon = PoolVector2Array( -105, -29, 105, -29, 105, -24, -105, -24 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="platform"]
 position = Vector2( 0, -27.5 )
 shape = SubResource( 1 )
+one_way_collision = true

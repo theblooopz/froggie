@@ -4,27 +4,30 @@
 [ext_resource path="res://assets/audio/BounceYoFrankie.wav" type="AudioStream" id=2]
 [ext_resource path="res://assets/scripts/bounce.gd" type="Script" id=3]
 
+[sub_resource type="OccluderPolygon2D" id=2]
+polygon = PoolVector2Array( -201, 48, -209.107, 50.6518, -209.107, 57.6518, -182.107, 67.6518, -179.107, 67.6518, -179, 74, -173.107, 75.6518, -175.107, 113.652, -174.107, 117.652, -174.107, 127.652, -176.107, 130.652, -178.107, 142.652, -144.107, 141.652, -148.107, 126.652, -149.107, 82.6518, -149.107, 76.6518, -144.107, 73.6518, -144.107, 67.6518, -123.107, 60.6518, -117, 59, -116, 51, -120, 48 )
+
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 42, 4 )
-
-[sub_resource type="OccluderPolygon2D" id=7]
-polygon = PoolVector2Array( -135.573, 1.36875, -154.573, 15.3687, -156.573, 15.3687, -174.573, 34.3687, -175.573, 34.3687, -187.573, 49.3687, -188.573, 49.3687, -191.573, 59.3687, -192.573, 59.3687, -192.573, 62.3687, -180.573, 62.3687, -162.573, 50.3687, -161.573, 50.3687, -160.573, 52.3687, -160.573, 54.3687, -155.573, 56.3687, -154.573, 56.3687, -154.573, 62.3687, -133.573, 62.3687, -131.573, 58.3687, -131.573, 55.3687, -133.573, 53.3687, -134.573, 53.3687, -137.573, 37.3687, -138.573, 37.3687, -134.573, 31.3687, -134.573, 28.3687, -138.573, 27.3687, -138.573, 25.3687, -127.573, 6.36875, -127.573, 0.368748, -135.573, 0.368748 )
 
 [sub_resource type="RectangleShape2D" id=6]
 extents = Vector2( 41.5, 1 )
 
-[node name="mushroom" type="StaticBody2D" groups=["BOUNCE", "GROUND"]]
+[node name="mushroom1" type="StaticBody2D" groups=["BOUNCE", "GROUND"]]
 collision_layer = 256
 script = ExtResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="."]
 texture = ExtResource( 1 )
 region_enabled = true
-region_rect = Rect2( 159.771, 32.2637, 65.6029, 62.735 )
+region_rect = Rect2( 160.474, 95.7827, 97.2648, 97.131 )
+
+[node name="LightOccluder2D2" type="LightOccluder2D" parent="."]
+position = Vector2( 161, -95 )
+occluder = SubResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( -4, 1 )
-rotation = -0.749365
+position = Vector2( -1, -41 )
 shape = SubResource( 1 )
 one_way_collision = true
 
@@ -34,13 +37,8 @@ volume_db = -20.0
 max_distance = 800.0
 bus = "SFX"
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
-position = Vector2( 156, -31 )
-occluder = SubResource( 7 )
-
 [node name="Area2D" type="Area2D" parent="."]
-position = Vector2( -14.2176, -9.98182 )
-rotation = -0.749365
+position = Vector2( -1, -56 )
 collision_layer = 256
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]

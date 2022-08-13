@@ -5,8 +5,18 @@
 #TODO weird jumps when hitting ceilings
 #TODO make froggie heavier when he's holding objects
 #TODO weird little bounce when bouncing on mushroom with crate
+#TODO do I need to worry about delta multiplying?
+
+#TODO for some weird reason it works on first swing but subsequent swings it stops working\
+# and reports the inital velocity the same all times following which is too low
 
 extends RigidBody2D
+
+
+#TODO need to add easy mode where it just naturally goes to the next anchor in direction\
+#that froggie is facing
+onready var easy_mode = false
+
 
 const SPEED = 300
 const RUN_FACTOR = 1.5
@@ -18,7 +28,7 @@ const SWING_POINT_DISTANCE = 400
 const ROLL_SPEED = 15
 
 
-const FROGGIE_MASS = 1
+onready var FROGGIE_MASS = get_mass()
 
 
 var _SPEED = SPEED
@@ -57,7 +67,6 @@ var contacts = {
 			}
 
 var rolling = false
-var initial_swing = true
 
 func _ready():
 	$death_timer.stop()
@@ -82,7 +91,6 @@ func _integrate_forces(state):
 	tongue.set_point_position(0, tongue_start.get_global_transform().origin\
 	 - get_parent().get_global_transform().origin)
 	
-
 	rolling = Input.is_action_pressed("move_roll")
 	
 	if Input.is_action_pressed("move_run") and not dancing:
@@ -96,22 +104,21 @@ func _integrate_forces(state):
 		$sprite.speed_scale = lerp($sprite.speed_scale, 2, ACCELERATION_FACTOR)
 		$footstep.set_pitch_scale(0.95)
 	
-	if swinging:
+	if Input.is_action_just_pressed("move_grapple"):
 		
 		rolling = false
-		
-		if initial_swing and anchor:
+
+		if anchor:
 			joint = anchor.get_node("joint")
 			swing = joint.get_node(joint.get_node_b())
 			#$swing_timer.start()
-			swing.reset_to_position(get_global_transform())
-			initial_swing = false
+			
+			swing.reset_to_position(get_global_transform(), state.linear_velocity, state.angular_velocity)
+			print(state.linear_velocity)
 			tongue_end = tongue_start.get_global_transform().origin - get_parent().get_global_transform().origin
 			call_deferred("set_mode", RigidBody2D.MODE_RIGID)
-			
 			#yield($swing_timer, "timeout")
-	else:
-		initial_swing = true
+
 		
 	var direction = Input.get_action_strength("move_right") \
 	- Input.get_action_strength("move_left")
@@ -127,9 +134,10 @@ func _integrate_forces(state):
 		anchor.get_global_transform().origin - get_parent().get_global_transform().origin, 0.25)
 		tongue.set_point_position(1, tongue_end)
 		
-		swing.apply_central_impulse(Vector2(direction*SWING_POWER,0))
-		#TODO MAGIC NUMBER
-		if not held_object: swing.set_angular_velocity(direction*3)
+		if swing:
+			swing.apply_central_impulse(Vector2(direction*SWING_POWER,0))
+			#TODO MAGIC NUMBER
+			if not held_object: swing.set_angular_velocity(direction*3)
 		if not tongue.visible: tongue.show()
 	else:
 		tongue_begin = tongue_start.get_global_transform().origin - get_parent().get_global_transform().origin
@@ -151,17 +159,17 @@ func _integrate_forces(state):
 
 
 	if Input.is_action_just_pressed("move_grapple"):
-				if anchor:
-					var dist = tongue_begin.distance_to(anchor.get_global_transform().origin - get_parent().get_global_transform().origin)
-					if dist < SWING_POINT_DISTANCE and not tongue_ray.is_colliding():
-						if $swing_cooldown.is_stopped():
-							swinging = true
-							$swing_cooldown.start()
-							anchor.get_node("swish").play()
-						else:
-							jump(state)
+		if anchor:
+			var dist = tongue_begin.distance_to(anchor.get_global_transform().origin - get_parent().get_global_transform().origin)
+			if dist < SWING_POINT_DISTANCE and not tongue_ray.is_colliding():
+				if $swing_cooldown.is_stopped():
+					swinging = true
+					$swing_cooldown.start()
+					anchor.get_node("swish").play()
 				else:
 					jump(state)
+		else:
+			jump(state)
 		
 	if Input.is_action_just_released("move_grapple"):
 		if not swinging:
@@ -175,25 +183,26 @@ func _integrate_forces(state):
 		jump(state)
 			
 
-	if not swinging:
-		if canmove:
-			motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION_FACTOR)
-			if abs(direction) and groundray.is_colliding():
-				if groundray.get_collider().is_in_group("DIRT"):
-					if not $footstep.is_playing() and not rolling and abs(state.transform.get_rotation()) < 0.1:
-						$footstep.play()
-					if not dust.is_emitting(): dust.set_emitting(true)
-				else:
-					if dust.is_emitting(): dust.set_emitting(false)
-			
-		var flag = false
+	#if not swinging:
+	if canmove:
+		motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION_FACTOR)
+		if abs(direction) and groundray.is_colliding():
+			if groundray.get_collider().is_in_group("DIRT"):
+				if not $footstep.is_playing() and not rolling and abs(state.transform.get_rotation()) < 0.1:
+					$footstep.play()
+				if not dust.is_emitting(): dust.set_emitting(true)
+			else:
+				if dust.is_emitting(): dust.set_emitting(false)
 		
+	var flag = false
+	if not swinging:
 		if groundray.is_colliding() and not jumping:
 			canmove = true
 			var grb = groundray.get_collider()
 			if grb.is_in_group("ROPE"): flag = true
 			if grb.is_in_group("BOUNCE") and grb.has_method("get_bounce_power"):
-				motion.y = grb.get_bounce_power()
+				pass
+				#TODO NEED TO ADD BOUNCE
 			elif not flag:
 				motion.y = 0
 				motion.y += motion.x  * cos(groundray.get_collision_normal().angle())
@@ -237,6 +246,7 @@ func _integrate_forces(state):
 			
 			if not contacts.ground_contact and not jumping:
 				motion.y += GRAVITY
+				
 			if jumping: 
 				canmove = true
 				motion.y -= JUMP_FORCE
@@ -259,11 +269,14 @@ func _integrate_forces(state):
 			var av = lerp(swing.angular_velocity, swing.angular_velocity, swing.angular_damp)
 			state.set_angular_velocity(av)
 		else:
-			swing.set_angular_velocity(0)
-			swing.set_linear_velocity(Vector2.ZERO)
-			motion = lerp(motion, Vector2.ZERO, swing.linear_damp)
-			var av = lerp(state.angular_velocity, 0, swing.angular_damp)
-			state.set_angular_velocity(av)
+			#swing.set_angular_velocity(0)
+			#swing.set_linear_velocity(Vector2.ZERO)
+			#swing.reset_to_position(swing.get_global_transform(), state.get_linear_velocity(), state.get_angular_velocity())
+			swing.reset_to_original()
+
+			#motion = lerp(motion, Vector2.ZERO, swing.linear_damp)
+			#var av = lerp(state.angular_velocity, 0, swing.angular_damp)
+			#state.set_angular_velocity(av)
 			
 	
 	if direction || jumping:
@@ -289,6 +302,8 @@ func _integrate_forces(state):
 				else:
 					$sprite.animation = "idle"
 			elif abs(state.transform.get_rotation()) >= 0.1:
+				#TODO maybe too easy???
+				#state.set_angular_velocity(_ROLL_SPEED * sign($sprite.scale.x))
 				state.set_angular_velocity(_ROLL_SPEED * direction)
 				$sprite.animation = "air"
 			else:
@@ -366,8 +381,9 @@ func _integrate_forces(state):
 	
 	
 	#TODO SET SIZE OF EXTENTS OF SWING_ZONE SWING COL TO SWING_POINT_DISTANCE
-	if direction: swing_zone_turn = direction
-	$swing_zone.set_position(Vector2((SWING_POINT_DISTANCE - 50) * swing_zone_turn,0))
+	if not easy_mode:
+		if direction: swing_zone_turn = direction
+		$swing_zone.set_position(Vector2((SWING_POINT_DISTANCE - 50) * swing_zone_turn,0))
 	
 	state.set_linear_velocity(motion)
 	

@@ -11,5 +11,5 @@ dest_files=[ "res://.import/mud02.ogg-c2937aebb123e687f46d90da9f32430a.oggstr" ]
 
 [params]
 
-loop=true
+loop=false
 loop_offset=0

@@ -32,7 +32,7 @@
 [ext_resource path="res://assets/controls/playarea.tscn" type="PackedScene" id=30]
 [ext_resource path="res://assets/environment/trees/16.png" type="Texture" id=31]
 [ext_resource path="res://assets/objects/rope.tscn" type="PackedScene" id=32]
-[ext_resource path="res://assets/objects/mushroom.tscn" type="PackedScene" id=33]
+[ext_resource path="res://assets/objects/mushroom1.tscn" type="PackedScene" id=34]
 
 [sub_resource type="GDScript" id=24]
 script/source = "extends CanvasLayer
@@ -160,26 +160,25 @@ shader_param/heightOffset = 0.0
 [sub_resource type="GDScript" id=27]
 script/source = "extends Area2D
 
-onready var splash = preload(\"res://assets/environment/splash.tscn\")
+onready var splash = preload(\"res://assets/environment/splash.tscn\").instance()
 
 func _on_water_area_body_entered(body):
 	if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
-		var si = splash.instance()
-		
+
+		var si = splash.duplicate()
 		#TODO makes it so the splash always occurs within the water block
 		var p = body.get_global_transform().origin + Vector2(0,10)
 		p.y = max(body.get_global_transform().origin.y + 10, p.y)
-		
 		si.set_position(p)
 		get_parent().get_parent().add_child(si)
 		si.get_node(\"AnimationPlayer\").play(\"splash\")
-
+		
 
 #TODO splash again if it comes out but only if it comes out from above
 func _on_water_area_body_exited(body):
 	if body.get_global_transform().origin.y <= get_global_transform().origin.y:
 		if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
-			var si = splash.instance()
+			var si = splash.duplicate()
 			
 			var p = body.get_global_transform().origin + Vector2(0,10)
 			p.y = max(body.get_global_transform().origin.y + 10, p.y)
@@ -215,7 +214,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 0.166855
+shader_param/zoom_y = 1.25992
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -622,7 +621,7 @@ position = Vector2( 3350, 37 )
 position = Vector2( -407, -99 )
 
 [node name="player" parent="." instance=ExtResource( 2 )]
-position = Vector2( 3591, 118 )
+position = Vector2( 3613, 122 )
 camera = NodePath("../camera")
 
 [node name="objects" type="Node2D" parent="."]
@@ -681,7 +680,7 @@ position = Vector2( 757, 20 )
 position = Vector2( 607, 20 )
 
 [node name="crate7" parent="objects/crates" instance=ExtResource( 20 )]
-position = Vector2( 3292, -355 )
+position = Vector2( 3420, -382 )
 
 [node name="crate8" parent="objects/crates" instance=ExtResource( 20 )]
 position = Vector2( 3514, -267 )
@@ -710,9 +709,9 @@ points = PoolVector2Array( 604, 1, 0, 0 )
 [node name="end" parent="objects/rope2" index="4"]
 position = Vector2( 604, 0 )
 
-[node name="mushroom" parent="objects" instance=ExtResource( 33 )]
-position = Vector2( 3462, -145 )
-bounce_power = 1500
+[node name="mushroom1" parent="objects" instance=ExtResource( 34 )]
+position = Vector2( 3593, -148 )
+bounce_power = Vector2( 0, -1000 )
 
 [node name="ground" type="Node2D" parent="."]
 
