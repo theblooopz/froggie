@@ -67,10 +67,12 @@ func jump(state):
 		if get_mode() == RigidBody2D.MODE_CHARACTER &&\
 		abs(state.transform.get_rotation()) < 0.1:
 			if not jumping:
-				if groundray.is_colliding() or contacts.rope_contact:
-					if not groundray.get_collider().is_in_group("BOUNCE"):
-						$jump_timer.start()
-						jumping = true
+				if groundray.is_colliding():
+					var gcol = groundray.get_collider()
+					if gcol or contacts.rope_contact:
+						if not gcol.is_in_group("BOUNCE"):
+							$jump_timer.start()
+							jumping = true
 						
 
 func _integrate_forces(state):

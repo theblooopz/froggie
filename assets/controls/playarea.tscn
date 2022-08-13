@@ -5,26 +5,27 @@ script/source = "extends Area2D
 
 export(NodePath) var camera
 
-onready var player = null
+onready var object = null
 
 func _ready():
 	var cam = get_node(camera)
-	$collision.shape.set_extents(Vector2(cam.limit_right, cam.limit_bottom))
+	set_position(Vector2(cam.limit_left, cam.limit_top))
+	$collision.shape.set_extents(Vector2(cam.limit_right, cam.limit_bottom + abs(cam.limit_top)))
 	$collision.transform.origin = $collision.shape.extents/2
 
 
 func _on_playarea_body_exited(body):
-	if body.is_in_group(\"OBJECT\"):
-		player = body
+	if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
+		object = body
 		$death_timer.start()
 
 func _on_timer_timeout():
-	if player.has_method(\"on_death\"):
-		if not overlaps_body(player):
-			player.on_death()
+	if object.has_method(\"on_death\"):
+		if not overlaps_body(object):
+			object.on_death()
 	else:
-		if not overlaps_body(player):
-			player.queue_free()
+		if not overlaps_body(object):
+			object.queue_free()
 "
 
 [sub_resource type="RectangleShape2D" id=20]

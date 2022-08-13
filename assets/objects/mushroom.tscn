@@ -8,9 +8,6 @@ script/source = "extends StaticBody2D
 
 export(int) var bounce_power = 1000
 
-func _ready():
-	add_collision_exception_with($Area2D)
-
 func get_bounce_power():
 	return -bounce_power
 
@@ -52,7 +49,7 @@ one_way_collision = true
 [node name="sfx" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 2 )
 volume_db = -20.0
-max_distance = 500.0
+max_distance = 800.0
 bus = "SFX"
 
 [node name="Area2D" type="Area2D" parent="."]

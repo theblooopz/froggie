@@ -157,6 +157,41 @@ shader_param/detail = 1.0
 shader_param/distortion = 0.165
 shader_param/heightOffset = 0.0
 
+[sub_resource type="GDScript" id=27]
+script/source = "extends Area2D
+
+onready var splash = preload(\"res://assets/environment/splash.tscn\")
+
+func _on_water_area_body_entered(body):
+	if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
+		var si = splash.instance()
+		
+		#TODO makes it so the splash always occurs within the water block
+		var p = body.get_global_transform().origin + Vector2(0,10)
+		p.y = max(body.get_global_transform().origin.y + 10, p.y)
+		
+		si.set_position(p)
+		get_parent().get_parent().add_child(si)
+		si.get_node(\"AnimationPlayer\").play(\"splash\")
+
+
+#TODO splash again if it comes out but only if it comes out from above
+func _on_water_area_body_exited(body):
+	if body.get_global_transform().origin.y <= get_global_transform().origin.y:
+		if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
+			var si = splash.instance()
+			
+			var p = body.get_global_transform().origin + Vector2(0,10)
+			p.y = max(body.get_global_transform().origin.y + 10, p.y)
+		
+			si.set_position(p)
+			get_parent().get_parent().add_child(si)
+			si.get_node(\"AnimationPlayer\").play(\"splash\")
+"
+
+[sub_resource type="RectangleShape2D" id=26]
+extents = Vector2( 128.819, 140.184 )
+
 [sub_resource type="Gradient" id=11]
 offsets = PoolRealArray( 0.502164, 1 )
 
@@ -180,34 +215,10 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 0.249116
+shader_param/zoom_y = 0.166855
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
-
-[sub_resource type="GDScript" id=27]
-script/source = "extends Area2D
-
-onready var splash = preload(\"res://assets/environment/splash.tscn\")
-
-func _on_water_area_body_entered(body):
-	if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
-		var si = splash.instance()
-		si.set_position(body.get_global_transform().origin + Vector2(0,10))
-		get_parent().get_parent().add_child(si)
-		si.get_node(\"AnimationPlayer\").play(\"splash\")
-
-
-func _on_water_area_body_exited(body):
-	if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
-		var si = splash.instance()
-		si.set_position(body.get_global_transform().origin + Vector2(0,10))
-		get_parent().get_parent().add_child(si)
-		si.get_node(\"AnimationPlayer\").play(\"splash\")
-"
-
-[sub_resource type="RectangleShape2D" id=26]
-extents = Vector2( 128.819, 118.206 )
 
 [node name="test" type="Node2D"]
 
@@ -299,7 +310,7 @@ position = Vector2( -17, 5 )
 current = true
 zoom = Vector2( 1.33, 1.33 )
 limit_left = -500
-limit_top = -1000
+limit_top = -500
 limit_right = 4500
 limit_bottom = 750
 limit_smoothed = true
@@ -991,6 +1002,17 @@ texture_mode = 1
 joint_mode = 2
 round_precision = 6
 
+[node name="water_area" type="Area2D" parent="."]
+position = Vector2( 1906.11, 946.629 )
+scale = Vector2( 22.6719, 2.31641 )
+collision_layer = 0
+collision_mask = 33
+script = SubResource( 27 )
+
+[node name="col" type="CollisionShape2D" parent="water_area"]
+position = Vector2( 0.967445, 28.7718 )
+shape = SubResource( 26 )
+
 [node name="water" type="Sprite" parent="."]
 material = SubResource( 13 )
 position = Vector2( -980, 602 )
@@ -1000,18 +1022,8 @@ normal_map = ExtResource( 7 )
 centered = false
 script = ExtResource( 10 )
 
-[node name="water_area" type="Area2D" parent="water"]
-position = Vector2( 127.299, 148.777 )
-collision_layer = 0
-collision_mask = 33
-script = SubResource( 27 )
-
-[node name="col" type="CollisionShape2D" parent="water/water_area"]
-position = Vector2( 0.967445, 6.79352 )
-shape = SubResource( 26 )
-
-[connection signal="body_entered" from="water/water_area" to="water/water_area" method="_on_water_area_body_entered"]
-[connection signal="body_exited" from="water/water_area" to="water/water_area" method="_on_water_area_body_exited"]
+[connection signal="body_entered" from="water_area" to="water_area" method="_on_water_area_body_entered"]
+[connection signal="body_exited" from="water_area" to="water_area" method="_on_water_area_body_exited"]
 
 [editable path="objects/rope"]
 [editable path="objects/rope2"]
