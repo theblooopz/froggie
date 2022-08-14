@@ -10,6 +10,11 @@
 #TODO for some weird reason it works on first swing but subsequent swings it stops working\
 # and reports the inital velocity the same all times following which is too low
 
+#TODO MOST IMPORTANT
+#TODO sometimes froggie latches on to an anchor but matches with the wrong swing DEFINITELY NEED TO FIX
+#TODO need to fix one way collision platforms... gets stuck when jump
+# underneath because groundray collides
+
 extends RigidBody2D
 
 
