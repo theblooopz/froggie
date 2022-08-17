@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=29 format=2]
 
 [ext_resource path="res://assets/froggie/froggie.gd" type="Script" id=1]
 [ext_resource path="res://assets/froggie/froggieSprite0007.png" type="Texture" id=2]
@@ -29,6 +29,7 @@ func _ready():
 	cam.set_remote_node(get_node(camera).get_path())
 	yield(get_tree(), \"idle_frame\")
 	get_node(camera).set_enable_follow_smoothing(true)
+	get_node(camera).reset_smoothing()
 "
 
 [sub_resource type="Curve" id=31]
@@ -67,31 +68,8 @@ radius = 21.0
 [sub_resource type="OccluderPolygon2D" id=5]
 polygon = PoolVector2Array( 4, 11, -4, 11, -9, 14, -9, 19, -4, 21, 5, 21, 8, 18, 7, 14 )
 
-[sub_resource type="GDScript" id=9]
-script/source = "extends Area2D
-
-onready var froggie = get_parent()
-
-func _on_swing_zone_body_entered(body):
-	if not froggie.swinging:
-		if body.is_in_group(\"ANCHOR\"): 
-			froggie.anchors.push_back(body)
-			#body.get_node(\"ColorRect\").color = Color(1,0,0,1)
-	else:
-		if body.is_in_group(\"ANCHOR\"): 
-			froggie.second_anchor = body
-			froggie.anchors.push_back(body)
-			#body.get_node(\"ColorRect\").color = Color(0,0,1,1)
-
-
-func _on_swing_zone_body_exited(body):
-	if body in froggie.anchors:
-		froggie.anchors.remove(froggie.anchors.find(body))
-		body.get_node(\"ColorRect\").color = Color(\"0070ff\")
-"
-
 [sub_resource type="CircleShape2D" id=30]
-radius = 450.0
+radius = 96.026
 
 [sub_resource type="Gradient" id=28]
 offsets = PoolRealArray( 0.421277, 0.52766, 0.629787 )
@@ -140,7 +118,7 @@ color_ramp = SubResource( 32 )
 [node name="froggie" type="RigidBody2D" parent="." groups=["PLAYER"]]
 collision_mask = 291
 mode = 2
-gravity_scale = 5.0
+gravity_scale = 15.0
 custom_integrator = true
 continuous_cd = 2
 contacts_reported = 4
@@ -203,7 +181,6 @@ update_scale = false
 [node name="swing_zone" type="Area2D" parent="froggie"]
 collision_layer = 8
 collision_mask = 4
-script = SubResource( 9 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -253,6 +230,7 @@ bus = "SFX"
 [node name="tongue_ray" type="RayCast2D" parent="."]
 position = Vector2( 2, -12 )
 enabled = true
+cast_to = Vector2( 25, 25 )
 collision_mask = 66
 
 [node name="groundray" type="RayCast2D" parent="."]
@@ -293,6 +271,4 @@ __meta__ = {
 
 [connection signal="body_entered" from="froggie" to="froggie" method="_on_froggie_body_entered"]
 [connection signal="timeout" from="froggie/jump_timer" to="froggie" method="_on_jump_timer_timeout"]
-[connection signal="body_entered" from="froggie/swing_zone" to="froggie/swing_zone" method="_on_swing_zone_body_entered"]
-[connection signal="body_exited" from="froggie/swing_zone" to="froggie/swing_zone" method="_on_swing_zone_body_exited"]
 [connection signal="timeout" from="froggie/death_timer" to="froggie" method="_on_death_timer_timeout"]

@@ -1,9 +1,11 @@
 extends Node
 
 onready var HUD_visible = true
+onready var easy_mode = true
 
 func _onready():
 	set_process_input(true)
+	set_play_mode()
 
 func _input(event):
 	
@@ -22,3 +24,17 @@ func _input(event):
 		var HUD = get_node("/root/test/HUD")
 		HUD.visible = not HUD.visible
 		HUD_visible = HUD.visible
+	
+	if event.is_action_pressed("global_mode"):
+		set_play_mode()
+		
+func set_play_mode():
+		var label = get_node("/root/test/HUD/info_container/panel/ModeLabel")
+		if easy_mode:
+			label.set_bbcode("Current mode = [color=red]HARD[/color]")
+			easy_mode = false
+		else:
+			label.set_bbcode("Current mode = [color=green]EASY[/color]")
+			easy_mode = true
+		
+		get_node("/root/test/player/froggie").easy_mode = easy_mode

@@ -20,17 +20,17 @@ extends RigidBody2D
 
 #TODO need to add easy mode where it just naturally goes to the next anchor in direction\
 #that froggie is facing
-onready var easy_mode = false
+onready var easy_mode = true
 
 
-const SPEED = 300
+const SPEED = 25 * 1000
 const RUN_FACTOR = 1.5
-const GRAVITY = 10 * 3
-const JUMP_FORCE = 50
+const JUMP_FORCE = 2500
 const ACCELERATION_FACTOR = 0.8
+const DECELLERATION_FACTOR = 0.8
 const SWING_POWER = 9
 const SWING_POINT_DISTANCE = 400
-const ROLL_SPEED = 15
+const ROLL_SPEED = 15 * 50
 
 
 onready var FROGGIE_MASS = get_mass()
@@ -50,12 +50,10 @@ onready var dust = $"../dust"
 onready var tongue_end = Vector2.ZERO
 onready var tongue_begin = Vector2.ZERO
 onready var tongue_start = $tongue_start
-onready var blood = $blood
 
 onready var swing_zone_turn = 1
 
 onready var anchor = null
-onready var second_anchor = null
 onready var swing = null
 onready var joint = null
 onready var dancing = false
@@ -63,13 +61,11 @@ onready var jumping = false
 onready var dead = false
 onready var canmove = true
 onready var held_object = null
+onready var slope = 0
+onready var grounded = false
+onready var ground_h_velocity = 0
 
 var anchors = []
-
-var contacts = {
-				ground_contact = false,
-				rope_contact = false
-			}
 
 var rolling = false
 
@@ -82,16 +78,66 @@ func jump(state):
 		abs(state.transform.get_rotation()) < 0.1:
 			if not jumping:
 				if groundray.is_colliding():
-					var gcol = groundray.get_collider()
-					if gcol or contacts.rope_contact:
-						if not gcol.is_in_group("BOUNCE"):
+						if groundray.get_collider().is_in_group("GROUND") or\
+						groundray.get_collider().is_in_group("ROPE"):
 							$jump_timer.start()
 							jumping = true
-						
+				elif grounded:
+						$jump_timer.start()
+						jumping = true
+
+
+func apply_gravity(state, direction):
+	
+	var step = state.get_step()
+	
+	motion.x -= ground_h_velocity
+	ground_h_velocity = 0
+	
+	motion.x = lerp(motion.x, 0, DECELLERATION_FACTOR) * step
+	
+	#if not groundray.is_colliding():
+	var bodies = get_colliding_bodies()
+	var idx = 0
+	var ground_idx = -1
+	for body in bodies:
+		if (body.is_in_group("GROUND") or body.is_in_group("ROPE")) and state.get_contact_count() > 0:
+			
+			if state.get_contact_count() > idx:
+				var a = state.get_contact_local_normal(idx)
+				if a.dot(Vector2(0, -1)) > 0.6:
+					grounded = true
+					ground_idx = idx
+					break
+				else:
+					grounded = false
+		else:
+			grounded = false
+			
+		idx += 1
+	
+	if grounded:
+		ground_h_velocity = state.get_contact_collider_velocity_at_position(ground_idx).x
+		motion.x += ground_h_velocity * step
+		motion.y = 0
+	else:
+		if not jumping:
+			motion += state.get_total_gravity() * step
+	
+	if jumping:
+		motion.y -= JUMP_FORCE * step
+	
+	if canmove:
+		var s = _SPEED*direction
+		motion.x += lerp(motion.x, s, ACCELERATION_FACTOR) *step
 
 func _integrate_forces(state):
 	
 	if dead: return
+	
+	var step = state.get_step()
+	
+	anchors = $swing_zone.get_overlapping_bodies()
 	
 	tongue.set_point_position(0, tongue_start.get_global_transform().origin\
 	 - get_parent().get_global_transform().origin)
@@ -101,6 +147,7 @@ func _integrate_forces(state):
 	if Input.is_action_pressed("move_run") and not dancing:
 		_SPEED = SPEED*RUN_FACTOR
 		_ROLL_SPEED = ROLL_SPEED*RUN_FACTOR
+		#TODO 2 is a magic number
 		$sprite.speed_scale = lerp($sprite.speed_scale, 2 + RUN_FACTOR, ACCELERATION_FACTOR)
 		$footstep.set_pitch_scale(RUN_FACTOR)
 	else:
@@ -119,7 +166,6 @@ func _integrate_forces(state):
 			#$swing_timer.start()
 			
 			swing.reset_to_position(get_global_transform(), state.linear_velocity, state.angular_velocity)
-			print(state.linear_velocity)
 			tongue_end = tongue_start.get_global_transform().origin - get_parent().get_global_transform().origin
 			call_deferred("set_mode", RigidBody2D.MODE_RIGID)
 			#yield($swing_timer, "timeout")
@@ -131,6 +177,7 @@ func _integrate_forces(state):
 	if not direction or not groundray.is_colliding():
 		if $footstep.is_playing(): $footstep.stop()
 		if dust.is_emitting(): dust.set_emitting(false)
+	
 	
 	if swinging and anchor:
 		tongue_begin = get_position() - tongue_start.get_position()
@@ -159,8 +206,11 @@ func _integrate_forces(state):
 			
 			var dist = tongue_begin.distance_to(child.get_global_transform().get_origin() - get_parent().get_global_transform().origin)
 			if dist < SWING_POINT_DISTANCE and not tongue_ray.is_colliding():
-				anchor = child
-				break
+				if anchor:
+					if dist < tongue_begin.distance_to(anchor.get_global_transform().get_origin()- get_parent().get_global_transform().origin):
+						anchor = child
+				else:
+					anchor = child
 
 
 	if Input.is_action_just_pressed("move_grapple"):
@@ -180,89 +230,86 @@ func _integrate_forces(state):
 		if not swinging:
 			$swing_cooldown.stop()
 		swinging = false
-		if second_anchor:
-			anchor = second_anchor
-			second_anchor = null
 	
 	if Input.is_action_just_pressed("move_jump"):
 		jump(state)
-			
+	
+	apply_gravity(state, direction)
 
 	#if not swinging:
-	if canmove:
-		motion.x = lerp(motion.x, _SPEED * direction, ACCELERATION_FACTOR)
-		if abs(direction) and groundray.is_colliding():
-			if groundray.get_collider().is_in_group("DIRT"):
-				if not $footstep.is_playing() and not rolling and abs(state.transform.get_rotation()) < 0.1:
-					$footstep.play()
-				if not dust.is_emitting(): dust.set_emitting(true)
-			else:
-				if dust.is_emitting(): dust.set_emitting(false)
-		
-	var flag = false
-	if not swinging:
-		if groundray.is_colliding() and not jumping:
-			canmove = true
-			var grb = groundray.get_collider()
-			if grb.is_in_group("ROPE"): flag = true
-			if grb.is_in_group("BOUNCE") and grb.has_method("get_bounce_power"):
-				pass
-				#TODO NEED TO ADD BOUNCE
-			elif not flag:
-				motion.y = 0
-				motion.y += motion.x  * cos(groundray.get_collision_normal().angle())
-		
-		else:
-			
-			var bodies = get_colliding_bodies()
-			contacts.ground_contact = false
-			contacts.rope_contact = false
-			#var ceiling_contact = true
-			var l = 0
-			var idx = 0
-			var a = 0
-			var v = 0
-			for body in bodies:
-				if body.is_in_group("GROUND") and state.get_contact_count() > 0:
-					
-					if state.get_contact_count() > idx:
-						l = state.get_contact_local_normal(idx).x
-						v = state.get_contact_local_normal(idx).y
-						a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
-					
-					if v < 0:
-						contacts.ground_contact = true
-				
-				if body.is_in_group("ROPE") and state.get_contact_count() > 0:
-					
-					if state.get_contact_count() > idx:
-						l = state.get_contact_local_normal(idx).x
-						v = state.get_contact_local_normal(idx).y
-						a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
-					
-					if v < 0:
-						contacts.rope_contact= true
-						
-				idx += 1
-			
-			if a > 100:
-				canmove = false
-
-			
-			if not contacts.ground_contact and not jumping:
-				motion.y += GRAVITY
-				
-			if jumping: 
-				canmove = true
-				motion.y -= JUMP_FORCE
-			
-			if contacts.ground_contact and not jumping:
-				motion.x = lerp(motion.x, _SPEED * sign(l), ACCELERATION_FACTOR)
-				rolling = true
-			
-			if contacts.rope_contact and not jumping:
-				motion.y = 0
-				canmove = true
+#	if canmove:
+#		if abs(direction) and groundray.is_colliding():
+#			if groundray.get_collider().is_in_group("DIRT"):
+#				if not $footstep.is_playing() and not rolling and abs(state.transform.get_rotation()) < 0.1:
+#					$footstep.play()
+#				if not dust.is_emitting(): dust.set_emitting(true)
+#			else:
+#				if dust.is_emitting(): dust.set_emitting(false)
+#
+#	var flag = false
+#	if not swinging:
+#		if groundray.is_colliding() and not jumping:
+#			canmove = true
+#			var grb = groundray.get_collider()
+#			if grb.is_in_group("ROPE"): flag = true
+#			if grb.is_in_group("BOUNCE") and grb.has_method("get_bounce_power"):
+#				pass
+#				#TODO NEED TO ADD BOUNCE
+#			elif not flag:
+#				motion.y = 0
+#				motion.y += motion.x  * cos(groundray.get_collision_normal().angle())
+#
+#		else:
+#
+#			var bodies = get_colliding_bodies()
+#			contacts.ground_contact = false
+#			contacts.rope_contact = false
+#			#var ceiling_contact = true
+#			var l = 0
+#			var idx = 0
+#			var a = 0
+#			var v = 0
+#			for body in bodies:
+#				if body.is_in_group("GROUND") and state.get_contact_count() > 0:
+#
+#					if state.get_contact_count() > idx:
+#						l = state.get_contact_local_normal(idx).x
+#						v = state.get_contact_local_normal(idx).y
+#						a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
+#
+#					if v < 0:
+#						contacts.ground_contact = true
+#
+#				if body.is_in_group("ROPE") and state.get_contact_count() > 0:
+#
+#					if state.get_contact_count() > idx:
+#						l = state.get_contact_local_normal(idx).x
+#						v = state.get_contact_local_normal(idx).y
+#						a = abs(rad2deg(state.get_contact_local_normal(idx).angle()))
+#
+#					if v < 0:
+#						contacts.rope_contact= true
+#
+#				idx += 1
+#
+#			if a > 100:
+#				canmove = false
+#
+#
+#			if not contacts.ground_contact and not jumping:
+#				motion.y += GRAVITY
+#
+#			if jumping: 
+#				canmove = true
+#				motion.y -= JUMP_FORCE
+#
+#			if contacts.ground_contact and not jumping:
+#				motion.x = lerp(motion.x, _SPEED * sign(l), ACCELERATION_FACTOR)
+#				rolling = true
+#
+#			if contacts.rope_contact and not jumping:
+#				motion.y = 0
+#				canmove = true
 
 	if ceilingray.is_colliding() and not held_object:
 		jumping = false
@@ -292,9 +339,9 @@ func _integrate_forces(state):
 			$sprite.scale.x = abs($sprite.scale.x)*sign(direction)
 			$sprite.animation = "run"
 			if rolling:
-				state.set_angular_velocity(_ROLL_SPEED * direction)
+				state.set_angular_velocity(_ROLL_SPEED * direction * step)
 			elif abs(state.transform.get_rotation()) >= 0.1:
-				state.set_angular_velocity(_ROLL_SPEED * direction)
+				state.set_angular_velocity(_ROLL_SPEED * direction * step)
 			else:
 				$sprite.animation = "run"
 				call_deferred("set_mode", RigidBody2D.MODE_CHARACTER)
@@ -308,7 +355,7 @@ func _integrate_forces(state):
 					$sprite.animation = "idle"
 			elif abs(state.transform.get_rotation()) >= 0.1:
 				#TODO maybe too easy???
-				#state.set_angular_velocity(_ROLL_SPEED * sign($sprite.scale.x))
+				#state.set_angular_velocity(_ROLL_SPEED * sign($sprite.scale.x) * step)
 				state.set_angular_velocity(_ROLL_SPEED * direction)
 				$sprite.animation = "air"
 			else:
@@ -388,14 +435,18 @@ func _integrate_forces(state):
 	#TODO SET SIZE OF EXTENTS OF SWING_ZONE SWING COL TO SWING_POINT_DISTANCE
 	if not easy_mode:
 		if direction: swing_zone_turn = direction
-		$swing_zone.set_position(Vector2((SWING_POINT_DISTANCE - 50) * swing_zone_turn,0))
+		$swing_zone.set_position(Vector2((SWING_POINT_DISTANCE - 100) * swing_zone_turn,0))
+	else:
+		$swing_zone.set_position(Vector2.ZERO)
+	$swing_zone.get_node("swing_col").get_shape().set_radius(SWING_POINT_DISTANCE)
 	
 	state.set_linear_velocity(motion)
 	
-	if anchor:
-		var dist = tongue_begin.distance_to(anchor.get_global_transform().origin - get_parent().get_global_transform().origin)
-		if dist < SWING_POINT_DISTANCE:
-			anchor.get_node("ColorRect").color = Color(1,0,0,1)
+#	if anchor:
+#		var dist = tongue_begin.distance_to(anchor.get_global_transform().origin - get_parent().get_global_transform().origin)
+#		if dist < SWING_POINT_DISTANCE:
+#			anchor.get_node("ColorRect").color = Color(1,0,0,1)
+
 
 func on_death(_clean = true):
 	
@@ -423,4 +474,3 @@ func _on_jump_timer_timeout():
 
 func _on_death_timer_timeout():
 	var _r = get_tree().change_scene("res://assets/test/test.tscn")
-

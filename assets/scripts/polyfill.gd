@@ -6,6 +6,11 @@ func _ready():
 	col.set_polygon(poly)
 	add_child(col)
 	
+	var lic = LightOccluder2D.new()
+	lic.occluder = OccluderPolygon2D.new()
+	lic.occluder.set_polygon(poly)
+	add_child(lic)
+	
 	#$grassline.points = []
 	
 	#do_outline($Polygon2D)
