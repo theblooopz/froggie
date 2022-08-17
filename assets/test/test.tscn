@@ -246,12 +246,12 @@ script = SubResource( 24 )
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 309.0
-margin_bottom = 429.0
+margin_bottom = 442.0
 size_flags_horizontal = 9
 
 [node name="panel" type="Panel" parent="HUD/info_container"]
 margin_right = 289.0
-margin_bottom = 409.0
+margin_bottom = 422.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -271,7 +271,8 @@ bbcode_enabled = true
 bbcode_text = "[color=yellow][center]INSTRUCTIONS[/center][/color]
 
 [color=red]Hard mode:[/color] Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
-[color=green]Easy mode[/color]: Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
+
+[color=green]Easy mode[/color]: Froggie needs to be within a certain distance of an anchor block and it will automatically set the closest anchor in that range as the active anchor.
 
 
 
@@ -291,7 +292,8 @@ Press Enter = continue dialogue"
 text = "INSTRUCTIONS
 
 Hard mode: Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
-Easy mode: Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
+
+Easy mode: Froggie needs to be within a certain distance of an anchor block and it will automatically set the closest anchor in that range as the active anchor.
 
 
 
@@ -315,9 +317,9 @@ scroll_active = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 10.0
-margin_top = 176.0
+margin_top = 189.0
 margin_right = -10.0
-margin_bottom = -218.0
+margin_bottom = -205.0
 size_flags_horizontal = 3
 custom_colors/default_color = Color( 1, 1, 1, 1 )
 bbcode_enabled = true
