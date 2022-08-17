@@ -1,27 +1,13 @@
-#TODO cotton stuffing comes out on death
+#TODO cotton stuffing comes out on death (soma wants this)
 #TODO lerp lifting the box on head
-#TODO sometimes when frog jumps with box from ends then starts rolling and loses box
 #TODO drawing in _process and game logic in _physics_process/_integrate_forces
 #TODO weird jumps when hitting ceilings
 #TODO make froggie heavier when he's holding objects
-#TODO weird little bounce when bouncing on mushroom with crate
 #TODO do I need to worry about delta multiplying?
-
-#TODO for some weird reason it works on first swing but subsequent swings it stops working\
-# and reports the inital velocity the same all times following which is too low
-
-#TODO MOST IMPORTANT
-#TODO sometimes froggie latches on to an anchor but matches with the wrong swing DEFINITELY NEED TO FIX
-#TODO need to fix one way collision platforms... gets stuck when jump
-# underneath because groundray collides
 
 extends RigidBody2D
 
-
-#TODO need to add easy mode where it just naturally goes to the next anchor in direction\
-#that froggie is facing
-onready var easy_mode = true
-
+onready var easy_mode = global.get_play_mode()
 
 const SPEED = 25 * 1000
 const RUN_FACTOR = 1.5

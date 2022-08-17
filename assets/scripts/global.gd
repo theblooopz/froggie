@@ -5,7 +5,6 @@ onready var easy_mode = true
 
 func _onready():
 	set_process_input(true)
-	set_play_mode()
 
 func _input(event):
 	
@@ -27,14 +26,26 @@ func _input(event):
 	
 	if event.is_action_pressed("global_mode"):
 		set_play_mode()
+
+func get_play_mode():
+	
+	var label = get_node("/root/test/HUD/info_container/panel/ModeLabel")
+	var froggie = get_node("/root/test/player/froggie")
+	froggie.easy_mode = easy_mode
+	if not froggie.easy_mode:
+		label.set_bbcode("Current mode = [color=red]HARD[/color]")
+	else:
+		label.set_bbcode("Current mode = [color=green]EASY[/color]")
+		
+	return easy_mode
 		
 func set_play_mode():
 		var label = get_node("/root/test/HUD/info_container/panel/ModeLabel")
-		if easy_mode:
+		var froggie = get_node("/root/test/player/froggie")
+		froggie.easy_mode = not froggie.easy_mode
+		easy_mode = froggie.easy_mode
+
+		if not froggie.easy_mode:
 			label.set_bbcode("Current mode = [color=red]HARD[/color]")
-			easy_mode = false
 		else:
 			label.set_bbcode("Current mode = [color=green]EASY[/color]")
-			easy_mode = true
-		
-		get_node("/root/test/player/froggie").easy_mode = easy_mode
