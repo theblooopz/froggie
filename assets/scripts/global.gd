@@ -1,6 +1,6 @@
 extends Node
 
-onready var HUD_visible = true
+onready var INFOc_visible = true
 onready var easy_mode = true
 
 func _onready():
@@ -20,9 +20,9 @@ func _input(event):
 		OS.window_fullscreen = not OS.window_fullscreen
 
 	if event.is_action_pressed("global_help"):
-		var HUD = get_node("/root/test/HUD")
-		HUD.visible = not HUD.visible
-		HUD_visible = HUD.visible
+		var INFOc = get_node("/root/test/HUD/info_container")
+		INFOc.visible = not INFOc.visible
+		INFOc_visible = INFOc.visible
 	
 	if event.is_action_pressed("global_mode"):
 		set_play_mode()

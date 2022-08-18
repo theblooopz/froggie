@@ -37,12 +37,11 @@
 [ext_resource path="res://addons/dialogic/Dialog.tscn" type="PackedScene" id=36]
 [ext_resource path="res://assets/scripts/dialog_zoom.gd" type="Script" id=37]
 
-[sub_resource type="GDScript" id=24]
-script/source = "extends CanvasLayer
+[sub_resource type="GDScript" id=34]
+script/source = "extends MarginContainer
 
 func _ready():
-	self.visible = global.HUD_visible
-
+	self.visible = global.INFOc_visible
 "
 
 [sub_resource type="StyleBoxFlat" id=23]
@@ -233,7 +232,6 @@ shader_param/distortion_map = ExtResource( 6 )
 
 [node name="HUD" type="CanvasLayer" parent="."]
 layer = 3
-script = SubResource( 24 )
 
 [node name="info_container" type="MarginContainer" parent="HUD"]
 light_mask = 0
@@ -242,6 +240,7 @@ margin_top = 20.0
 margin_right = 309.0
 margin_bottom = 463.0
 size_flags_horizontal = 9
+script = SubResource( 34 )
 
 [node name="panel" type="Panel" parent="HUD/info_container"]
 margin_right = 289.0
@@ -321,11 +320,12 @@ scroll_active = false
 
 [node name="Dialog" parent="HUD" instance=ExtResource( 36 )]
 light_mask = 0
-margin_left = 698.0
-margin_top = 354.0
-margin_right = 698.0
-margin_bottom = 354.0
+margin_left = 22.0
+margin_top = 13.0
+margin_right = 22.0
+margin_bottom = 13.0
 timeline = "timeline-1660787886.json"
+add_canvas = false
 
 [node name="dialog_control" type="Node" parent="HUD"]
 script = ExtResource( 37 )
@@ -336,6 +336,7 @@ layer = 2
 
 [node name="ColorRect2" type="ColorRect" parent="fadein"]
 visible = false
+light_mask = 0
 margin_left = -394.0
 margin_top = -202.0
 margin_right = 1527.0
@@ -398,6 +399,7 @@ transform = Transform2D( 1.33, 0, 0, 1, 0, -180 )
 scroll_ignore_camera_zoom = true
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+light_mask = 0
 motion_scale = Vector2( 0.06, 0 )
 motion_mirroring = Vector2( 1346.67, 0 )
 
@@ -408,6 +410,7 @@ texture = ExtResource( 33 )
 centered = false
 
 [node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
+light_mask = 0
 motion_scale = Vector2( 0.04, 0 )
 motion_mirroring = Vector2( 1363.24, 0 )
 
@@ -430,7 +433,7 @@ texture = ExtResource( 14 )
 texture_scale = 10.0
 color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
 energy = 1.66
-range_layer_min = -1
+range_layer_min = -3
 range_layer_max = 16
 shadow_enabled = true
 shadow_gradient_length = 52.6

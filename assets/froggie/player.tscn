@@ -90,17 +90,20 @@ func _ready():
 
 
 func _on_playarea_body_exited(body):
-	if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
-		object = body
-		$death_timer.start()
+	if body:
+		if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
+			object = body
+			$death_timer.start()
 
 func _on_timer_timeout():
-	if object.has_method(\"on_death\"):
-		if not overlaps_body(object):
-			object.on_death()
-	else:
-		if not overlaps_body(object):
-			object.queue_free()
+	pass
+#	if object:
+#		if object.has_method(\"on_death\"):
+#			if not overlaps_body(object):
+#				object.on_death()
+#		else:
+#			if not overlaps_body(object):
+#				object.queue_free()
 "
 
 [sub_resource type="RectangleShape2D" id=20]

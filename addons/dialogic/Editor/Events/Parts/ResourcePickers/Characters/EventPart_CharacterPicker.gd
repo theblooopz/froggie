@@ -142,6 +142,7 @@ func build_PickerMenuFolder(menu:PopupMenu, folder_structure:Dictionary, current
 		picker_menu.update_submenu_style(submenu)
 	
 	var files_info = DialogicUtil.get_characters_dict()
+
 	for file in folder_structure['files']:
 		menu.add_item(files_info[file]['name'])
 		# this doesn't work right now, because it doesn't have the editor_reference. Would be nice though
