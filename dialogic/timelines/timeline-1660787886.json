@@ -25,10 +25,10 @@
 			"z_index": 0
 		},
 		{
-			"character": "character-1660787893.json",
+			"character": "",
 			"event_id": "dialogic_001",
 			"portrait": "(Don't change)",
-			"text": "Hello! I'm [color=red][b]Froggie[/b][/color]."
+			"text": "Hello! I'm [b]Froggie[/b]."
 		},
 		{
 			"character": "character-1660787893.json",

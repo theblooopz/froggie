@@ -231,7 +231,7 @@ shader_param/distortion_map = ExtResource( 6 )
 [node name="test" type="Node2D"]
 
 [node name="HUD" type="CanvasLayer" parent="."]
-layer = 3
+layer = 10
 
 [node name="info_container" type="MarginContainer" parent="HUD"]
 light_mask = 0
@@ -325,7 +325,6 @@ margin_top = 13.0
 margin_right = 22.0
 margin_bottom = 13.0
 timeline = "timeline-1660787886.json"
-add_canvas = false
 
 [node name="dialog_control" type="Node" parent="HUD"]
 script = ExtResource( 37 )
@@ -434,7 +433,7 @@ texture_scale = 10.0
 color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
 energy = 1.66
 range_layer_min = -3
-range_layer_max = 16
+range_layer_max = 3
 shadow_enabled = true
 shadow_gradient_length = 52.6
 shadow_filter = 2
