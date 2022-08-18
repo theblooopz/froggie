@@ -18,7 +18,6 @@ const SWING_POWER = 9
 const SWING_POINT_DISTANCE = 400
 const ROLL_SPEED = 15 * 50
 
-
 onready var FROGGIE_MASS = get_mass()
 
 
@@ -42,7 +41,7 @@ onready var swing_zone_turn = 1
 onready var anchor = null
 onready var swing = null
 onready var joint = null
-onready var dancing = false
+onready var dancing = true
 onready var jumping = false
 onready var dead = false
 onready var canmove = true
@@ -51,12 +50,28 @@ onready var slope = 0
 onready var grounded = false
 onready var ground_h_velocity = 0
 
+onready var default_zoom = Vector2(1.15,1.15)
+onready var camera = null
+
+onready var camera_zoom = Vector2(1,1)
+onready var camera_zoom_to = default_zoom
+onready var camera_zoom_out = Vector2(1.33,1.33)
+
 var anchors = []
 
 var rolling = false
 
 func _ready():
 	$death_timer.stop()
+
+
+	camera = get_parent().get_node("camera")
+	#print(camera)
+	yield(get_tree(), "idle_frame")
+	camera.set_enable_follow_smoothing(true)
+	camera.reset_smoothing()
+	
+	set_process(true)
 
 func jump(state):
 	
@@ -117,11 +132,17 @@ func apply_gravity(state, direction):
 		var s = _SPEED*direction
 		motion.x += lerp(motion.x, s, ACCELERATION_FACTOR) *step
 
+
+func _process(delta):
+	camera_zoom = lerp(camera_zoom,camera_zoom_to,delta)
+	camera.set_zoom(camera_zoom)
+
 func _integrate_forces(state):
 	
 	if dead: return
 	
 	var step = state.get_step()
+
 	
 	anchors = $swing_zone.get_overlapping_bodies()
 	
@@ -147,6 +168,7 @@ func _integrate_forces(state):
 		rolling = false
 
 		if anchor:
+			
 			joint = anchor.get_node("joint")
 			swing = joint.get_node(joint.get_node_b())
 			#$swing_timer.start()
@@ -185,6 +207,7 @@ func _integrate_forces(state):
 	
 	
 	if not swinging:
+		
 		anchor = null
 		for child in anchors:
 			
@@ -207,6 +230,7 @@ func _integrate_forces(state):
 					swinging = true
 					$swing_cooldown.start()
 					anchor.get_node("swish").play()
+					camera_zoom_to = camera_zoom_out
 				else:
 					jump(state)
 		else:
@@ -216,6 +240,7 @@ func _integrate_forces(state):
 		if not swinging:
 			$swing_cooldown.stop()
 		swinging = false
+		camera_zoom_to = default_zoom
 	
 	if Input.is_action_just_pressed("move_jump"):
 		jump(state)
@@ -350,11 +375,12 @@ func _integrate_forces(state):
 				call_deferred("set_mode", RigidBody2D.MODE_CHARACTER)
 				
 	
-	if Input.is_action_just_pressed("move_dance"):
+	if Input.is_action_just_pressed("move_dance") or dancing:
 		if not abs(state.transform.get_rotation()) >= 0.1 and not held_object:
-			dancing = true
-			tongue.hide()
-			$sprite.animation = "dance"
+			if not swinging:
+				dancing = true
+				tongue.hide()
+				$sprite.animation = "dance"
 
 
 	if not groundray.is_colliding():

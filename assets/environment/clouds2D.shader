@@ -4,7 +4,7 @@
 shader_type canvas_item;
 render_mode blend_mul;
 
-uniform vec4 tint :hint_color = vec4(0.0);
+uniform sampler2D tint;
 uniform sampler2D noise_texture2 :hint_black;
 uniform sampler2D gradient_texture :hint_black;
 
@@ -23,6 +23,8 @@ void fragment() {
 	vec2 noise1_uv = UV * tile_factor1 + scroll_direction1 * TIME * time_scale1;
 	float noise1 = texture(TEXTURE, noise1_uv + noise2 * 0.02).r;
 	
+	vec4 tintcol = texture(tint,UV).rgba;
+	
 	float clouds = texture(gradient_texture, vec2(noise1, 0.0)).r;
-	COLOR.rgb = mix(vec3(1.0), tint.rgb, clouds * tint.a);
+	COLOR.rgb = mix(vec3(1.0), tintcol.rgb, clouds * tintcol.a);
 }

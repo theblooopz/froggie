@@ -1,0 +1,175 @@
+[gd_scene load_steps=23 format=2]
+
+[ext_resource path="res://assets/froggie/froggie.gd" type="Script" id=1]
+[ext_resource path="res://assets/froggie/froggieSprite0014.png" type="Texture" id=2]
+[ext_resource path="res://assets/froggie/froggieSprite0010.png" type="Texture" id=3]
+[ext_resource path="res://assets/froggie/froggieSprite0011.png" type="Texture" id=4]
+[ext_resource path="res://assets/froggie/froggieSprite0008.png" type="Texture" id=5]
+[ext_resource path="res://assets/froggie/froggieSprite0009.png" type="Texture" id=6]
+[ext_resource path="res://assets/froggie/froggieSprite0005.png" type="Texture" id=7]
+[ext_resource path="res://assets/froggie/froggieSprite0002.png" type="Texture" id=8]
+[ext_resource path="res://assets/froggie/froggieSprite0006.png" type="Texture" id=9]
+[ext_resource path="res://assets/froggie/froggieSprite0013.png" type="Texture" id=10]
+[ext_resource path="res://assets/froggie/froggieSprite0012.png" type="Texture" id=11]
+[ext_resource path="res://assets/audio/mud02.ogg" type="AudioStream" id=12]
+[ext_resource path="res://assets/froggie/froggieSprite0001.png" type="Texture" id=13]
+[ext_resource path="res://assets/froggie/froggieSprite0007.png" type="Texture" id=14]
+[ext_resource path="res://assets/froggie/froggieSprite0004.png" type="Texture" id=15]
+[ext_resource path="res://assets/froggie/froggieSprite0003.png" type="Texture" id=16]
+
+[sub_resource type="SpriteFrames" id=1]
+animations = [ {
+"frames": [ ExtResource( 10 ) ],
+"loop": true,
+"name": "air",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 13 ), ExtResource( 8 ), ExtResource( 16 ), ExtResource( 15 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 14 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 3 ), ExtResource( 4 ) ],
+"loop": true,
+"name": "dance",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 11 ) ],
+"loop": true,
+"name": "idle",
+"speed": 12.0
+}, {
+"frames": [ ExtResource( 11 ), ExtResource( 10 ), ExtResource( 2 ) ],
+"loop": true,
+"name": "run",
+"speed": 5.0
+} ]
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 21.0
+
+[sub_resource type="OccluderPolygon2D" id=5]
+polygon = PoolVector2Array( 4, 11, -4, 11, -9, 14, -9, 19, -4, 21, 5, 21, 8, 18, 7, 14 )
+
+[sub_resource type="CircleShape2D" id=30]
+radius = 96.026
+
+[sub_resource type="Gradient" id=28]
+offsets = PoolRealArray( 0.421277, 0.52766, 0.629787 )
+colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 0.734694, 0.886275, 0.886275, 0.886275, 0 )
+
+[sub_resource type="GradientTexture2D" id=29]
+gradient = SubResource( 28 )
+fill = 1
+fill_from = Vector2( 0.516667, 0.548958 )
+
+[node name="froggie" type="RigidBody2D" groups=["PLAYER"]]
+collision_mask = 291
+mode = 2
+gravity_scale = 15.0
+custom_integrator = true
+continuous_cd = 2
+contacts_reported = 4
+contact_monitor = true
+can_sleep = false
+script = ExtResource( 1 )
+
+[node name="sprite" type="AnimatedSprite" parent="."]
+position = Vector2( -0.320999, 1 )
+scale = Vector2( 0.5, 0.5 )
+frames = SubResource( 1 )
+animation = "air"
+speed_scale = 2.0
+playing = true
+offset = Vector2( -4.98, 0.321 )
+
+[node name="collider" type="CollisionShape2D" parent="."]
+position = Vector2( 0, 1 )
+shape = SubResource( 4 )
+
+[node name="tongue_start" type="Node2D" parent="."]
+position = Vector2( 2, -12 )
+
+[node name="tongue_ray2" type="RemoteTransform2D" parent="tongue_start"]
+remote_path = NodePath("../../../tongue_ray")
+update_rotation = false
+
+[node name="swing_timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="swing_cooldown" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
+position = Vector2( 0, -16 )
+occluder = SubResource( 5 )
+
+[node name="jump_timer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="cam" type="RemoteTransform2D" parent="."]
+update_rotation = false
+update_scale = false
+
+[node name="groundray" type="RemoteTransform2D" parent="."]
+remote_path = NodePath("../../groundray")
+update_rotation = false
+
+[node name="ceilingray" type="RemoteTransform2D" parent="."]
+remote_path = NodePath("../../ceilingray")
+update_rotation = false
+
+[node name="holdray" type="RemoteTransform2D" parent="."]
+remote_path = NodePath("../../holdray")
+update_rotation = false
+update_scale = false
+
+[node name="swing_zone" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 4
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="swing_col" type="CollisionShape2D" parent="swing_zone"]
+shape = SubResource( 30 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="death_timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="blood" type="CPUParticles2D" parent="."]
+position = Vector2( 0, 9.01 )
+emitting = false
+amount = 32
+lifetime = 0.01
+preprocess = 0.6
+speed_scale = 0.01
+explosiveness = 0.22
+randomness = 0.36
+lifetime_randomness = 0.04
+texture = SubResource( 29 )
+emission_shape = 1
+emission_sphere_radius = 11.78
+direction = Vector2( 1, 1 )
+spread = 180.0
+initial_velocity = 100.0
+initial_velocity_random = 1.0
+angular_velocity_random = 1.0
+damping = 26.94
+damping_random = 0.15
+scale_amount = 0.11
+scale_amount_random = 0.13
+
+[node name="hold" type="RemoteTransform2D" parent="."]
+position = Vector2( 0, -45 )
+update_rotation = false
+
+[node name="footstep" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 12 )
+volume_db = -20.0
+pitch_scale = 0.95
+bus = "SFX"
+
+[connection signal="body_entered" from="." to="." method="_on_froggie_body_entered"]
+[connection signal="timeout" from="jump_timer" to="." method="_on_jump_timer_timeout"]
+[connection signal="timeout" from="death_timer" to="." method="_on_death_timer_timeout"]

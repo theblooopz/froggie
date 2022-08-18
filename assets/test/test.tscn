@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=2]
+[gd_scene load_steps=57 format=2]
 
 [ext_resource path="res://assets/scripts/polyfill.gd" type="Script" id=1]
 [ext_resource path="res://assets/froggie/player.tscn" type="PackedScene" id=2]
@@ -29,13 +29,13 @@
 [ext_resource path="res://assets/environment/trees/10.png" type="Texture" id=27]
 [ext_resource path="res://assets/environment/trees/22.png" type="Texture" id=28]
 [ext_resource path="res://assets/objects/seesaw.tscn" type="PackedScene" id=29]
-[ext_resource path="res://assets/controls/playarea.tscn" type="PackedScene" id=30]
 [ext_resource path="res://assets/environment/trees/16.png" type="Texture" id=31]
 [ext_resource path="res://assets/objects/rope.tscn" type="PackedScene" id=32]
 [ext_resource path="res://assets/environment/grassy_mountains/far_mountains_fc.png" type="Texture" id=33]
 [ext_resource path="res://assets/objects/mushroom1.tscn" type="PackedScene" id=34]
 [ext_resource path="res://assets/environment/grassy_mountains/grassy_mountains_fc.png" type="Texture" id=35]
 [ext_resource path="res://addons/dialogic/Dialog.tscn" type="PackedScene" id=36]
+[ext_resource path="res://assets/scripts/dialog_zoom.gd" type="Script" id=37]
 
 [sub_resource type="GDScript" id=24]
 script/source = "extends CanvasLayer
@@ -47,10 +47,7 @@ func _ready():
 
 [sub_resource type="StyleBoxFlat" id=23]
 bg_color = Color( 0, 0, 0, 0.658824 )
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+corner_detail = 1
 
 [sub_resource type="Animation" id=7]
 length = 0.001
@@ -114,15 +111,25 @@ colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
 [sub_resource type="GradientTexture" id=16]
 gradient = SubResource( 15 )
 
+[sub_resource type="Gradient" id=32]
+offsets = PoolRealArray( 0.416309, 1 )
+colors = PoolColorArray( 0, 0.935547, 1, 1, 0, 0.425, 0.5, 1 )
+
+[sub_resource type="GradientTexture2D" id=33]
+gradient = SubResource( 32 )
+fill = 1
+fill_from = Vector2( 0.858333, 0.190625 )
+fill_to = Vector2( 0, 0 )
+
 [sub_resource type="ShaderMaterial" id=14]
 shader = ExtResource( 12 )
-shader_param/tint = Color( 0.443137, 0.811765, 0.894118, 1 )
 shader_param/scroll_direction1 = Vector2( 0.8, 0 )
-shader_param/time_scale1 = 0.005
-shader_param/tile_factor1 = 0.703
+shader_param/time_scale1 = 0.008
+shader_param/tile_factor1 = 0.971
 shader_param/scroll_direction2 = Vector2( 0.75, 0 )
-shader_param/time_scale2 = 0.005
-shader_param/tile_factor2 = 0.884
+shader_param/time_scale2 = 0.017
+shader_param/tile_factor2 = 0.78
+shader_param/tint = SubResource( 33 )
 shader_param/noise_texture2 = ExtResource( 13 )
 shader_param/gradient_texture = SubResource( 16 )
 
@@ -217,26 +224,12 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 2.37841
+shader_param/zoom_y = 0.445449
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
 
 [node name="test" type="Node2D"]
-
-[node name="camera" type="Camera2D" parent="."]
-current = true
-zoom = Vector2( 1.33, 1.33 )
-limit_left = -500
-limit_top = -500
-limit_right = 4500
-limit_bottom = 750
-limit_smoothed = true
-smoothing_enabled = true
-smoothing_speed = 3.5
-editor_draw_limits = true
-
-[node name="playarea" parent="." instance=ExtResource( 30 )]
 
 [node name="HUD" type="CanvasLayer" parent="."]
 layer = 3
@@ -247,12 +240,12 @@ light_mask = 0
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 309.0
-margin_bottom = 442.0
+margin_bottom = 463.0
 size_flags_horizontal = 9
 
 [node name="panel" type="Panel" parent="HUD/info_container"]
 margin_right = 289.0
-margin_bottom = 422.0
+margin_bottom = 443.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -268,13 +261,12 @@ margin_right = -10.0
 margin_bottom = -25.0
 size_flags_horizontal = 3
 custom_colors/default_color = Color( 1, 1, 1, 1 )
+custom_constants/line_separation = 3
 bbcode_enabled = true
 bbcode_text = "[color=yellow][center]INSTRUCTIONS[/center][/color]
-
 [color=red]Hard mode:[/color] Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
 
 [color=green]Easy mode[/color]: Froggie needs to be within a certain distance of an anchor block and it will automatically set the closest anchor in that range as the active anchor.
-
 
 
 [color=teal]Controls[/color]
@@ -291,11 +283,9 @@ Press Ctrl+Enter = toggle fullscreen
 Press M = toggle hard/easy mode
 Press Enter = continue dialogue"
 text = "INSTRUCTIONS
-
 Hard mode: Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
 
 Easy mode: Froggie needs to be within a certain distance of an anchor block and it will automatically set the closest anchor in that range as the active anchor.
-
 
 
 Controls
@@ -318,9 +308,9 @@ scroll_active = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 10.0
-margin_top = 189.0
+margin_top = 185.0
 margin_right = -10.0
-margin_bottom = -205.0
+margin_bottom = -195.0
 size_flags_horizontal = 3
 custom_colors/default_color = Color( 1, 1, 1, 1 )
 bbcode_enabled = true
@@ -336,6 +326,10 @@ margin_top = 354.0
 margin_right = 698.0
 margin_bottom = 354.0
 timeline = "timeline-1660787886.json"
+
+[node name="dialog_control" type="Node" parent="HUD"]
+script = ExtResource( 37 )
+froggiePath = NodePath("../../player/froggie")
 
 [node name="fadein" type="CanvasLayer" parent="."]
 layer = 2
@@ -392,7 +386,7 @@ layer = -1
 [node name="clouds" type="Sprite" parent="clouds"]
 material = SubResource( 14 )
 position = Vector2( -228, -123 )
-scale = Vector2( 1.72266, 2.08008 )
+scale = Vector2( 1.72266, 1.72266 )
 texture = ExtResource( 11 )
 centered = false
 
@@ -401,21 +395,20 @@ layer = -1
 offset = Vector2( 0, -180 )
 scale = Vector2( 1.33, 1 )
 transform = Transform2D( 1.33, 0, 0, 1, 0, -180 )
-scroll_offset = Vector2( 1, 0 )
-scroll_base_scale = Vector2( 0.01, 1 )
+scroll_ignore_camera_zoom = true
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_scale = Vector2( 6, 0 )
+motion_scale = Vector2( 0.06, 0 )
 motion_mirroring = Vector2( 1346.67, 0 )
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
-modulate = Color( 0.831373, 0.941176, 0.713726, 1 )
+modulate = Color( 0.884, 1, 0.76, 1 )
 scale = Vector2( 3.509, 3.509 )
 texture = ExtResource( 33 )
 centered = false
 
 [node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_scale = Vector2( 4, 0 )
+motion_scale = Vector2( 0.04, 0 )
 motion_mirroring = Vector2( 1363.24, 0 )
 
 [node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
@@ -699,8 +692,10 @@ position = Vector2( 3350, 37 )
 position = Vector2( -407, -99 )
 
 [node name="player" parent="." instance=ExtResource( 2 )]
-position = Vector2( 2463, 458 )
-camera = NodePath("../camera")
+position = Vector2( 2466, 469 )
+
+[node name="dust" parent="player" index="1"]
+position = Vector2( 0, 20.684 )
 
 [node name="objects" type="Node2D" parent="."]
 position = Vector2( 255, 290 )
@@ -1099,8 +1094,10 @@ normal_map = ExtResource( 7 )
 centered = false
 script = ExtResource( 10 )
 
+[connection signal="dialogic_signal" from="HUD/Dialog" to="HUD/dialog_control" method="_on_Dialog_dialogic_signal"]
 [connection signal="body_entered" from="water_area" to="water_area" method="_on_water_area_body_entered"]
 [connection signal="body_exited" from="water_area" to="water_area" method="_on_water_area_body_exited"]
 
+[editable path="player"]
 [editable path="objects/rope"]
 [editable path="objects/rope2"]

@@ -12,7 +12,7 @@ func _ready():
 	
 	var start = $begin.get_position()
 	var end = $end.get_position()
-	var v = start.direction_to(end) * start.distance_to(end)
+	#var v = start.direction_to(end) * start.distance_to(end)
 	
 	var segcount = ceil(start.distance_to(end)/SEGMENT_WIDTH)
 	
@@ -60,7 +60,7 @@ func _ready():
 		ljn.set_node_b($end.get_path())
 		$joints.add_child(ljn)
 	
-func _process(delta):
+func _process(_delta):
 	var list = []
 	
 	list.append($begin.get_position())
