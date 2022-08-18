@@ -2,8 +2,8 @@
 
 [sub_resource type="OpenSimplexNoise" id=1]
 seed = 19
-period = 129.3
-persistence = 0.361
+period = 115.1
+persistence = 0.306
 lacunarity = 3.65
 
 [resource]

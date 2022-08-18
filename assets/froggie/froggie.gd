@@ -5,6 +5,9 @@
 #TODO make froggie heavier when he's holding objects
 #TODO do I need to worry about delta multiplying?
 
+#TODO IMPORTANT STILL NEED TO FIX IT CONNECTING TO THE WRONG SWING SOMETIMES
+
+
 extends RigidBody2D
 
 onready var easy_mode = global.get_play_mode()
@@ -170,6 +173,7 @@ func _integrate_forces(state):
 		if anchor:
 			
 			joint = anchor.get_node("joint")
+			#yield(get_tree(), "idle_frame")
 			swing = joint.get_node(joint.get_node_b())
 			#$swing_timer.start()
 			

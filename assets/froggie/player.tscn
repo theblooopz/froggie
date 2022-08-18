@@ -96,14 +96,13 @@ func _on_playarea_body_exited(body):
 			$death_timer.start()
 
 func _on_timer_timeout():
-	pass
-#	if object:
-#		if object.has_method(\"on_death\"):
-#			if not overlaps_body(object):
-#				object.on_death()
-#		else:
-#			if not overlaps_body(object):
-#				object.queue_free()
+	if object:
+		if object.has_method(\"on_death\"):
+			if not overlaps_body(object):
+				object.on_death()
+		else:
+			if not overlaps_body(object):
+				object.queue_free()
 "
 
 [sub_resource type="RectangleShape2D" id=20]
