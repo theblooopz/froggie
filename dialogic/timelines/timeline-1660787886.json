@@ -1,6 +1,11 @@
 {
 	"events": [
 		{
+			"event_id": "dialogic_023",
+			"hide_dialogbox": true,
+			"wait_seconds": 5
+		},
+		{
 			"emit_signal": "zoom_in",
 			"event_id": "dialogic_040"
 		},

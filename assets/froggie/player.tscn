@@ -81,6 +81,7 @@ script/source = "extends Area2D
 export(NodePath) var camera
 
 onready var object = null
+onready var death_timer = $death_timer
 
 func _ready():
 	var cam = get_node(camera)
@@ -93,7 +94,7 @@ func _on_playarea_body_exited(body):
 	if body:
 		if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
 			object = body
-			$death_timer.start()
+			death_timer.start()
 
 func _on_timer_timeout():
 	if object:

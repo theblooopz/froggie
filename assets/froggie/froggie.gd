@@ -14,7 +14,7 @@ onready var easy_mode = global.get_play_mode()
 
 const SPEED = 25 * 1000
 const RUN_FACTOR = 1.5
-const JUMP_FORCE = 2500
+const JUMP_FORCE = 3000
 const ACCELERATION_FACTOR = 0.8
 const DECELLERATION_FACTOR = 0.8
 const SWING_POWER = 9
@@ -44,7 +44,7 @@ onready var swing_zone_turn = 1
 onready var anchor = null
 onready var swing = null
 onready var joint = null
-onready var dancing = true
+onready var dancing = false
 onready var jumping = false
 onready var dead = false
 onready var canmove = true

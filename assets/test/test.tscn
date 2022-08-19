@@ -223,7 +223,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 0.5
+shader_param/zoom_y = 1.18921
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -272,13 +272,13 @@ bbcode_text = "[color=yellow][center]INSTRUCTIONS[/center][/color]
 Press T: toggle this display
 Hold A,D = run left, run right
 Hold Shift = increase speed
-Hold W = tongue grapple/jump
-Press Space = jump
+Hold Shift+W = tongue grapple
+Press Space/W = jump
 Hold S = roll
 press Q = dance
 Press R = restart
 Press E = hold/release box
-Press Ctrl+Enter = toggle fullscreen
+Press Alt+Enter = toggle fullscreen
 Press M = toggle hard/easy mode
 Press Enter = continue dialogue"
 text = "INSTRUCTIONS
@@ -291,13 +291,13 @@ Controls
 Press T: toggle this display
 Hold A,D = run left, run right
 Hold Shift = increase speed
-Hold W = tongue grapple/jump
-Press Space = jump
+Hold Shift+W = tongue grapple
+Press Space/W = jump
 Hold S = roll
 press Q = dance
 Press R = restart
 Press E = hold/release box
-Press Ctrl+Enter = toggle fullscreen
+Press Alt+Enter = toggle fullscreen
 Press M = toggle hard/easy mode
 Press Enter = continue dialogue"
 fit_content_height = true
@@ -380,11 +380,12 @@ layer = -1
 offset = Vector2( 0, -180 )
 scale = Vector2( 1.33, 1 )
 transform = Transform2D( 1.33, 0, 0, 1, 0, -180 )
+scroll_base_scale = Vector2( 10, 10 )
 scroll_ignore_camera_zoom = true
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 light_mask = 0
-motion_scale = Vector2( 0.06, 0 )
+motion_scale = Vector2( 0.006, 0 )
 motion_mirroring = Vector2( 1346.67, 0 )
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
@@ -395,7 +396,7 @@ centered = false
 
 [node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
 light_mask = 0
-motion_scale = Vector2( 0.04, 0 )
+motion_scale = Vector2( 0.004, 0 )
 motion_mirroring = Vector2( 1363.24, 0 )
 
 [node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
