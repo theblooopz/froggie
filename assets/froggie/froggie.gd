@@ -489,4 +489,4 @@ func _on_jump_timer_timeout():
 	jumping = false
 
 func _on_death_timer_timeout():
-	var _r = get_tree().change_scene("res://assets/test/test.tscn")
+	var _r = get_tree().reload_current_scene()

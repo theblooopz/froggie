@@ -1,0 +1,457 @@
+[gd_scene load_steps=38 format=2]
+
+[ext_resource path="res://assets/environment/clouds_noise1.tres" type="Texture" id=1]
+[ext_resource path="res://assets/environment/clouds2D.shader" type="Shader" id=2]
+[ext_resource path="res://assets/environment/light.png" type="Texture" id=3]
+[ext_resource path="res://assets/environment/water_sidescroll_2D_full.shader" type="Shader" id=4]
+[ext_resource path="res://assets/environment/water_uv_offset.png" type="Texture" id=5]
+[ext_resource path="res://assets/environment/water_normal.png" type="Texture" id=6]
+[ext_resource path="res://assets/environment/water_diffuse.png" type="Texture" id=7]
+[ext_resource path="res://assets/environment/WaterSidescroll2D.gd" type="Script" id=8]
+[ext_resource path="res://assets/scripts/polyfill.gd" type="Script" id=9]
+[ext_resource path="res://assets/environment/sand.png" type="Texture" id=10]
+[ext_resource path="res://addons/dialogic/Dialog.tscn" type="PackedScene" id=11]
+[ext_resource path="res://assets/scripts/dialog_zoom.gd" type="Script" id=12]
+[ext_resource path="res://assets/froggie/player.tscn" type="PackedScene" id=13]
+[ext_resource path="res://assets/environment/FroggieCidon.png" type="Texture" id=14]
+[ext_resource path="res://assets/froggie/swing_point.tscn" type="PackedScene" id=15]
+[ext_resource path="res://assets/environment/desert_bg.png" type="Texture" id=16]
+[ext_resource path="res://assets/scripts/wind.shader" type="Shader" id=17]
+[ext_resource path="res://assets/environment/trees/Pirates!_PalmTree02_sprite01.png" type="Texture" id=18]
+[ext_resource path="res://assets/environment/trees/Pirates!_PalmTree03_sprite01.png" type="Texture" id=19]
+
+[sub_resource type="GDScript" id=43]
+script/source = "extends MarginContainer
+
+func _ready():
+	self.visible = global.INFOc_visible
+"
+
+[sub_resource type="StyleBoxFlat" id=44]
+bg_color = Color( 0, 0, 0, 0.658824 )
+corner_detail = 1
+
+[sub_resource type="Animation" id=45]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("ColorRect2:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Color( 0, 0, 0, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("ColorRect2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ false ]
+}
+
+[sub_resource type="Animation" id=46]
+resource_name = "fadein"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("ColorRect2:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0, 0, 0, 1 ), Color( 0, 0, 0, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("ColorRect2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Gradient" id=34]
+offsets = PoolRealArray( 0.55, 0.792857 )
+colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
+
+[sub_resource type="GradientTexture" id=16]
+gradient = SubResource( 34 )
+
+[sub_resource type="OpenSimplexNoise" id=35]
+period = 100.1
+persistence = 0.641
+lacunarity = 2.64
+
+[sub_resource type="NoiseTexture" id=36]
+seamless = true
+noise = SubResource( 35 )
+
+[sub_resource type="Gradient" id=37]
+offsets = PoolRealArray( 0.4, 1 )
+colors = PoolColorArray( 0.576782, 0.711865, 0.820313, 1, 0.144608, 0.164134, 0.457031, 1 )
+
+[sub_resource type="GradientTexture2D" id=33]
+gradient = SubResource( 37 )
+fill = 1
+fill_from = Vector2( 0.910448, 0 )
+fill_to = Vector2( 0, 0.893035 )
+
+[sub_resource type="ShaderMaterial" id=38]
+shader = ExtResource( 2 )
+shader_param/scroll_direction1 = Vector2( 0.8, 0 )
+shader_param/time_scale1 = 0.008
+shader_param/tile_factor1 = 0.971
+shader_param/scroll_direction2 = Vector2( 0.75, 0 )
+shader_param/time_scale2 = 0.057
+shader_param/tile_factor2 = 2.214
+shader_param/tint = SubResource( 33 )
+shader_param/noise_texture2 = SubResource( 36 )
+shader_param/gradient_texture = SubResource( 16 )
+
+[sub_resource type="ShaderMaterial" id=53]
+shader = ExtResource( 17 )
+shader_param/speed = 1.0
+shader_param/minStrength = 0.014
+shader_param/maxStrength = 0.112
+shader_param/strengthScale = 100.09
+shader_param/interval = 3.5
+shader_param/detail = 1.025
+shader_param/distortion = 0.06
+shader_param/heightOffset = 0.0
+
+[sub_resource type="OccluderPolygon2D" id=52]
+polygon = PoolVector2Array( 43, -61, 21, -114, 2, -170, -29, -179, -53, -162, -61, -135, -43, -32, -39, 17, -83, 69, -99, 198, 63, 202, 100, 195, 114, 169, 78, 81, 51, 8 )
+
+[sub_resource type="GDScript" id=47]
+script/source = "extends Area2D
+
+onready var splash = preload(\"res://assets/environment/splash.tscn\").instance()
+
+func _on_water_area_body_entered(body):
+	if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
+
+		var si = splash.duplicate()
+		#TODO makes it so the splash always occurs within the water block
+		var p = body.get_global_transform().origin + Vector2(0,10)
+		p.y = max(body.get_global_transform().origin.y + 10, p.y)
+		si.set_position(p)
+		get_parent().get_parent().add_child(si)
+		si.get_node(\"AnimationPlayer\").play(\"splash\")
+		
+
+#TODO splash again if it comes out but only if it comes out from above
+func _on_water_area_body_exited(body):
+	if body.get_global_transform().origin.y <= get_global_transform().origin.y:
+		if body.is_in_group(\"OBJECT\") or body.is_in_group(\"PLAYER\"):
+			var si = splash.duplicate()
+			
+			var p = body.get_global_transform().origin + Vector2(0,10)
+			p.y = max(body.get_global_transform().origin.y + 10, p.y)
+		
+			si.set_position(p)
+			get_parent().get_parent().add_child(si)
+			si.get_node(\"AnimationPlayer\").play(\"splash\")
+"
+
+[sub_resource type="RectangleShape2D" id=48]
+extents = Vector2( 128.819, 140.184 )
+
+[sub_resource type="Gradient" id=49]
+offsets = PoolRealArray( 0.502164, 1 )
+
+[sub_resource type="GradientTexture" id=50]
+gradient = SubResource( 49 )
+
+[sub_resource type="ShaderMaterial" id=51]
+shader = ExtResource( 4 )
+shader_param/water_tint = Color( 0.337255, 0.623529, 0.752941, 1 )
+shader_param/shadow_color = Color( 0.301961, 0.313726, 0.647059, 1 )
+shader_param/distortion_scale = Vector2( 0.868, 0.422 )
+shader_param/distortion_time_scale = 0.01
+shader_param/distortion_amplitude = 0.008
+shader_param/tile_factor = 0.638
+shader_param/water_time_scale = 0.05
+shader_param/reflection_intensity = 0.437
+shader_param/transform = Basis( 1, 0, 0, 0.279, 1.8, 0.55, 0, 0, 1 )
+shader_param/parallax_factor = 0.441
+shader_param/shore_color = Color( 0.811765, 0.811765, 0.811765, 1 )
+shader_param/shore_size = 0.03
+shader_param/shore_smoothness = 0.017
+shader_param/shore_height_factor = 0.1
+shader_param/scale = Vector2( 22.6719, 2.31641 )
+shader_param/zoom_y = 0.39685
+shader_param/aspect_ratio = 1.0
+shader_param/transition_gradient = SubResource( 50 )
+shader_param/distortion_map = ExtResource( 5 )
+
+[node name="test" type="Node2D"]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="info_container" type="MarginContainer" parent="HUD"]
+light_mask = 0
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 309.0
+margin_bottom = 463.0
+size_flags_horizontal = 9
+script = SubResource( 43 )
+
+[node name="panel" type="Panel" parent="HUD/info_container"]
+margin_right = 289.0
+margin_bottom = 443.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_styles/panel = SubResource( 44 )
+
+[node name="InfoText" type="RichTextLabel" parent="HUD/info_container/panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -25.0
+size_flags_horizontal = 3
+custom_colors/default_color = Color( 1, 1, 1, 1 )
+custom_constants/line_separation = 3
+bbcode_enabled = true
+bbcode_text = "[color=yellow][center]INSTRUCTIONS[/center][/color]
+[color=red]Hard mode:[/color] Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
+
+[color=green]Easy mode[/color]: Froggie needs to be within a certain distance of an anchor block and it will automatically set the closest anchor in that range as the active anchor.
+
+
+[color=teal]Controls[/color]
+Press T: toggle this display
+Hold A,D = run left, run right
+Hold Shift = increase speed
+Hold Shift+W = tongue grapple
+Press Space/W = jump
+Hold S = roll
+press Q = dance
+Press R = restart
+Press E = hold/release box
+Press Alt+Enter = toggle fullscreen
+Press M = toggle hard/easy mode
+Press Enter = continue dialogue"
+text = "INSTRUCTIONS
+Hard mode: Froggie needs to be looking at the anchor block, and it has to be a certain distance away for successful tongue grapple
+
+Easy mode: Froggie needs to be within a certain distance of an anchor block and it will automatically set the closest anchor in that range as the active anchor.
+
+
+Controls
+Press T: toggle this display
+Hold A,D = run left, run right
+Hold Shift = increase speed
+Hold Shift+W = tongue grapple
+Press Space/W = jump
+Hold S = roll
+press Q = dance
+Press R = restart
+Press E = hold/release box
+Press Alt+Enter = toggle fullscreen
+Press M = toggle hard/easy mode
+Press Enter = continue dialogue"
+fit_content_height = true
+scroll_active = false
+
+[node name="ModeLabel" type="RichTextLabel" parent="HUD/info_container/panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 185.0
+margin_right = -10.0
+margin_bottom = -195.0
+size_flags_horizontal = 3
+custom_colors/default_color = Color( 1, 1, 1, 1 )
+bbcode_enabled = true
+bbcode_text = "Current mode = [color=green]EASY[/color]"
+text = "Current mode = EASY"
+fit_content_height = true
+scroll_active = false
+
+[node name="Dialog" parent="HUD" instance=ExtResource( 11 )]
+light_mask = 0
+margin_left = 22.0
+margin_top = 13.0
+margin_right = 22.0
+margin_bottom = 13.0
+timeline = "timeline-1660787886.json"
+
+[node name="dialog_control" type="Node" parent="HUD"]
+script = ExtResource( 12 )
+froggiePath = NodePath("../../player/froggie")
+
+[node name="fadein" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="ColorRect2" type="ColorRect" parent="fadein"]
+visible = false
+light_mask = 0
+margin_left = -394.0
+margin_top = -202.0
+margin_right = 1527.0
+margin_bottom = 942.0
+color = Color( 0, 0, 0, 0 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="fadein"]
+autoplay = "fadein"
+anims/RESET = SubResource( 45 )
+anims/fadein = SubResource( 46 )
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color( 0.956863, 0.952941, 0.807843, 1 )
+
+[node name="background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="ColorRect" type="ColorRect" parent="background"]
+margin_left = -271.0
+margin_top = -187.0
+margin_right = 1650.0
+margin_bottom = 957.0
+
+[node name="clouds" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="clouds" type="Sprite" parent="clouds"]
+material = SubResource( 38 )
+position = Vector2( -228, -123 )
+scale = Vector2( 1.72266, 1.72266 )
+texture = ExtResource( 1 )
+centered = false
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+layer = -1
+offset = Vector2( 0, -180 )
+scale = Vector2( 1.33, 1 )
+transform = Transform2D( 1.33, 0, 0, 1, 0, -180 )
+scroll_base_scale = Vector2( 10, 10 )
+scroll_ignore_camera_zoom = true
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+light_mask = 0
+motion_scale = Vector2( 0.006, 0 )
+motion_mirroring = Vector2( 1346.67, 0 )
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
+modulate = Color( 0.654902, 0.654902, 0.529412, 1 )
+position = Vector2( 0, 336 )
+scale = Vector2( 1.054, 0.89 )
+texture = ExtResource( 16 )
+centered = false
+
+[node name="sun" type="Light2D" parent="."]
+position = Vector2( 2190, -953 )
+texture = ExtResource( 3 )
+texture_scale = 10.0
+color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
+energy = 2.05
+range_layer_min = -3
+range_layer_max = 3
+shadow_enabled = true
+shadow_gradient_length = 52.6
+shadow_filter = 2
+shadow_filter_smooth = 1.5
+
+[node name="tree2" type="Sprite" parent="."]
+material = SubResource( 53 )
+position = Vector2( 1973, 415 )
+rotation = 0.280427
+scale = Vector2( 1, 1 )
+texture = ExtResource( 18 )
+
+[node name="tree3" type="Sprite" parent="."]
+material = SubResource( 53 )
+position = Vector2( 1555, 380 )
+rotation = -0.290618
+scale = Vector2( -1, 1 )
+texture = ExtResource( 19 )
+
+[node name="tree" type="Sprite" parent="."]
+material = SubResource( 53 )
+position = Vector2( 625, 319 )
+texture = ExtResource( 18 )
+
+[node name="Sprite" type="Sprite" parent="."]
+modulate = Color( 0.811765, 0.807843, 0.772549, 1 )
+position = Vector2( 1758, 294 )
+texture = ExtResource( 14 )
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Sprite"]
+position = Vector2( 6, 22 )
+occluder = SubResource( 52 )
+
+[node name="player" parent="." instance=ExtResource( 13 )]
+position = Vector2( 489, 443 )
+
+[node name="dust" parent="player" index="1"]
+position = Vector2( 0, 20.684 )
+
+[node name="weapon" parent="player" index="8"]
+visible = false
+
+[node name="ground1" type="StaticBody2D" parent="." groups=["DIRT", "GROUND"]]
+process_priority = 1
+position = Vector2( 2456, 276 )
+collision_layer = 2
+script = ExtResource( 9 )
+
+[node name="Polygon2D" type="Polygon2D" parent="ground1"]
+position = Vector2( 0, 7 )
+color = Color( 0.901961, 0.890196, 0.862745, 1 )
+antialiased = true
+texture = ExtResource( 10 )
+texture_scale = Vector2( 0.5, 0.986 )
+polygon = PoolVector2Array( -3212, 271, -2958, 193, -2741, 155, -2664, 208, -2582, 273, -2474, 307, -2343, 287, -2178, 218, -2072, 192, -1928, 182, -1825, 176, -1789, 236, -1721, 294, -1592, 481, -1424, 519, -1314, 495, -1267, 340, -1134, 279, -1056, 225, -865, 212, -577, 217, -480, 270, -399, 386, -342, 827, -1239, 846, -1535, 859, -1989, 848, -2240, 840, -2510, 856, -2858, 851, -3393, 853, -3396, 673, -3371, 402 )
+
+[node name="water_area" type="Area2D" parent="."]
+position = Vector2( 1906.11, 946.629 )
+scale = Vector2( 22.6719, 2.31641 )
+collision_layer = 0
+collision_mask = 33
+script = SubResource( 47 )
+
+[node name="col" type="CollisionShape2D" parent="water_area"]
+position = Vector2( 0.967445, 28.7718 )
+shape = SubResource( 48 )
+
+[node name="water" type="Sprite" parent="."]
+material = SubResource( 51 )
+position = Vector2( -980, 602 )
+scale = Vector2( 22.6719, 2.31641 )
+texture = ExtResource( 7 )
+normal_map = ExtResource( 6 )
+centered = false
+script = ExtResource( 8 )
+
+[node name="cam_trans" type="RemoteTransform2D" parent="."]
+
+[node name="swing_point" parent="." instance=ExtResource( 15 )]
+position = Vector2( 1010, 379 )
+
+[connection signal="dialogic_signal" from="HUD/Dialog" to="HUD/dialog_control" method="_on_Dialog_dialogic_signal"]
+[connection signal="body_entered" from="water_area" to="water_area" method="_on_water_area_body_entered"]
+[connection signal="body_exited" from="water_area" to="water_area" method="_on_water_area_body_exited"]
+
+[editable path="player"]

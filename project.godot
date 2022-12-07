@@ -81,7 +81,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Froggie"
-run/main_scene="res://assets/test/test.tscn"
+run/main_scene="res://assets/test/desert_test.tscn"
 config/icon="res://icon.png"
 
 [autoload]

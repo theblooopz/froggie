@@ -107,14 +107,14 @@ tracks/1/keys = {
 offsets = PoolRealArray( 0.484848, 0.558442 )
 colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
 
-[sub_resource type="GradientTexture" id=16]
+[sub_resource type="GradientTexture" id=35]
 gradient = SubResource( 15 )
 
 [sub_resource type="Gradient" id=32]
 offsets = PoolRealArray( 0.416309, 1 )
 colors = PoolColorArray( 0, 0.935547, 1, 1, 0, 0.425, 0.5, 1 )
 
-[sub_resource type="GradientTexture2D" id=33]
+[sub_resource type="GradientTexture2D" id=36]
 gradient = SubResource( 32 )
 fill = 1
 fill_from = Vector2( 0.858333, 0.190625 )
@@ -128,9 +128,9 @@ shader_param/tile_factor1 = 0.971
 shader_param/scroll_direction2 = Vector2( 0.75, 0 )
 shader_param/time_scale2 = 0.017
 shader_param/tile_factor2 = 0.78
-shader_param/tint = SubResource( 33 )
+shader_param/tint = SubResource( 36 )
 shader_param/noise_texture2 = ExtResource( 13 )
-shader_param/gradient_texture = SubResource( 16 )
+shader_param/gradient_texture = SubResource( 35 )
 
 [sub_resource type="RectangleShape2D" id=6]
 extents = Vector2( 201.578, 72.835 )
@@ -203,7 +203,7 @@ extents = Vector2( 128.819, 140.184 )
 [sub_resource type="Gradient" id=11]
 offsets = PoolRealArray( 0.502164, 1 )
 
-[sub_resource type="GradientTexture" id=12]
+[sub_resource type="GradientTexture" id=37]
 gradient = SubResource( 11 )
 
 [sub_resource type="ShaderMaterial" id=13]
@@ -223,9 +223,9 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 0.235969
+shader_param/zoom_y = 0.25
 shader_param/aspect_ratio = 1.0
-shader_param/transition_gradient = SubResource( 12 )
+shader_param/transition_gradient = SubResource( 37 )
 shader_param/distortion_map = ExtResource( 6 )
 
 [node name="test" type="Node2D"]
@@ -699,9 +699,6 @@ position = Vector2( -407, -99 )
 
 [node name="player" parent="." instance=ExtResource( 2 )]
 position = Vector2( 2466, 469 )
-
-[node name="camera" parent="player" index="0"]
-position = Vector2( 104, 20 )
 
 [node name="dust" parent="player" index="1"]
 position = Vector2( 0, 20.684 )
