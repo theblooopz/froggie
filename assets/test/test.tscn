@@ -223,7 +223,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 1.18921
+shader_param/zoom_y = 0.235969
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 12 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -700,6 +700,9 @@ position = Vector2( -407, -99 )
 [node name="player" parent="." instance=ExtResource( 2 )]
 position = Vector2( 2466, 469 )
 
+[node name="camera" parent="player" index="0"]
+position = Vector2( 104, 20 )
+
 [node name="dust" parent="player" index="1"]
 position = Vector2( 0, 20.684 )
 
@@ -801,7 +804,7 @@ collision_layer = 2
 script = ExtResource( 1 )
 
 [node name="grass5" type="Node2D" parent="ground/ground1"]
-modulate = Color( 0.611765, 0.611765, 0.584314, 1 )
+modulate = Color( 0.623529, 0.623529, 0.498039, 1 )
 position = Vector2( -2271, 83 )
 scale = Vector2( 0.445233, 0.33 )
 
@@ -836,7 +839,7 @@ rotation = -0.0511743
 texture = ExtResource( 19 )
 
 [node name="grass6" type="Node2D" parent="ground/ground1"]
-modulate = Color( 0.611765, 0.611765, 0.584314, 1 )
+modulate = Color( 0.623529, 0.623529, 0.498039, 1 )
 position = Vector2( -1359, 85 )
 scale = Vector2( 0.445233, 0.33 )
 
@@ -903,7 +906,7 @@ collision_layer = 2
 script = ExtResource( 1 )
 
 [node name="grass3" type="Node2D" parent="ground/ground2"]
-modulate = Color( 0.611765, 0.611765, 0.584314, 1 )
+modulate = Color( 0.623529, 0.623529, 0.498039, 1 )
 position = Vector2( -2306, 70 )
 rotation = -0.00475921
 scale = Vector2( 0.5, 0.33 )
@@ -963,7 +966,7 @@ collision_layer = 2
 script = ExtResource( 1 )
 
 [node name="grass3" type="Node2D" parent="ground/ground3"]
-modulate = Color( 0.611765, 0.611765, 0.584314, 1 )
+modulate = Color( 0.623529, 0.623529, 0.498039, 1 )
 position = Vector2( -2208.39, 22.9257 )
 rotation = 0.114333
 scale = Vector2( 0.5, 0.33 )
@@ -1005,7 +1008,7 @@ rotation = -0.0511743
 texture = ExtResource( 19 )
 
 [node name="grass4" type="Node2D" parent="ground/ground3"]
-modulate = Color( 0.611765, 0.611765, 0.584314, 1 )
+modulate = Color( 0.623529, 0.623529, 0.498039, 1 )
 position = Vector2( -2095.59, -321.515 )
 rotation = 0.150588
 scale = Vector2( 0.5, 0.33 )
@@ -1099,6 +1102,8 @@ texture = ExtResource( 8 )
 normal_map = ExtResource( 7 )
 centered = false
 script = ExtResource( 10 )
+
+[node name="cam_trans" type="RemoteTransform2D" parent="."]
 
 [connection signal="dialogic_signal" from="HUD/Dialog" to="HUD/dialog_control" method="_on_Dialog_dialogic_signal"]
 [connection signal="body_entered" from="water_area" to="water_area" method="_on_water_area_body_entered"]

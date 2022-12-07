@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://assets/froggie/froggie.gd" type="Script" id=1]
 [ext_resource path="res://assets/froggie/froggieSprite0007.png" type="Texture" id=2]
@@ -17,6 +17,7 @@
 [ext_resource path="res://assets/froggie/froggieSprite0013.png" type="Texture" id=15]
 [ext_resource path="res://assets/froggie/dust_particle.png" type="Texture" id=16]
 [ext_resource path="res://assets/audio/mud02.ogg" type="AudioStream" id=17]
+[ext_resource path="res://assets/weapons/weapon.tscn" type="PackedScene" id=18]
 
 [sub_resource type="Curve" id=31]
 _data = [ Vector2( 0, 0.235227 ), 0.0, 0.488648, 0, 0, Vector2( 1, 0.6625 ), -0.106294, 0.0, 0, 0 ]
@@ -275,6 +276,11 @@ volume_db = -20.0
 pitch_scale = 0.95
 bus = "SFX"
 
+[node name="weapon" type="RemoteTransform2D" parent="froggie"]
+position = Vector2( -4, 0 )
+remote_path = NodePath("../../weapon")
+update_rotation = false
+
 [node name="ceilingray" type="RayCast2D" parent="."]
 enabled = true
 cast_to = Vector2( 0, -35 )
@@ -300,6 +306,9 @@ antialiased = true
 __meta__ = {
 "_edit_lock_": true
 }
+
+[node name="weapon" parent="." instance=ExtResource( 18 )]
+position = Vector2( -4, 0 )
 
 [node name="playarea" type="Area2D" parent="."]
 collision_layer = 0

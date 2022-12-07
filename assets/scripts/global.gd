@@ -8,7 +8,7 @@ func _onready():
 
 func _input(event):
 	
-	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+	Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 	
 	if event.is_action_pressed("global_restart"):
 		var _r = get_tree().reload_current_scene()
