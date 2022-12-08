@@ -10,8 +10,8 @@
 [ext_resource path="res://assets/environment/WaterSidescroll2D.gd" type="Script" id=8]
 [ext_resource path="res://assets/scripts/polyfill.gd" type="Script" id=9]
 [ext_resource path="res://assets/environment/sand.png" type="Texture" id=10]
-[ext_resource path="res://addons/dialogic/Dialog.tscn" type="PackedScene" id=11]
-[ext_resource path="res://assets/scripts/dialog_zoom.gd" type="Script" id=12]
+[ext_resource path="res://assets/audio/wind.wav" type="AudioStream" id=11]
+[ext_resource path="res://assets/objects/crate.tscn" type="PackedScene" id=12]
 [ext_resource path="res://assets/froggie/player.tscn" type="PackedScene" id=13]
 [ext_resource path="res://assets/environment/FroggieCidon.png" type="Texture" id=14]
 [ext_resource path="res://assets/froggie/swing_point.tscn" type="PackedScene" id=15]
@@ -138,7 +138,7 @@ shader_param/heightOffset = 0.0
 [sub_resource type="OccluderPolygon2D" id=52]
 polygon = PoolVector2Array( 43, -61, 21, -114, 2, -170, -29, -179, -53, -162, -61, -135, -43, -32, -39, 17, -83, 69, -99, 198, 63, 202, 100, 195, 114, 169, 78, 81, 51, 8 )
 
-[sub_resource type="GDScript" id=47]
+[sub_resource type="GDScript" id=54]
 script/source = "extends Area2D
 
 onready var splash = preload(\"res://assets/environment/splash.tscn\").instance()
@@ -169,35 +169,35 @@ func _on_water_area_body_exited(body):
 			si.get_node(\"AnimationPlayer\").play(\"splash\")
 "
 
-[sub_resource type="RectangleShape2D" id=48]
+[sub_resource type="RectangleShape2D" id=55]
 extents = Vector2( 128.819, 140.184 )
 
-[sub_resource type="Gradient" id=49]
+[sub_resource type="Gradient" id=56]
 offsets = PoolRealArray( 0.502164, 1 )
 
-[sub_resource type="GradientTexture" id=50]
-gradient = SubResource( 49 )
+[sub_resource type="GradientTexture" id=57]
+gradient = SubResource( 56 )
 
-[sub_resource type="ShaderMaterial" id=51]
+[sub_resource type="ShaderMaterial" id=58]
 shader = ExtResource( 4 )
-shader_param/water_tint = Color( 0.337255, 0.623529, 0.752941, 1 )
-shader_param/shadow_color = Color( 0.301961, 0.313726, 0.647059, 1 )
-shader_param/distortion_scale = Vector2( 0.868, 0.422 )
-shader_param/distortion_time_scale = 0.01
-shader_param/distortion_amplitude = 0.008
-shader_param/tile_factor = 0.638
-shader_param/water_time_scale = 0.05
+shader_param/water_tint = Color( 0.160784, 0.470588, 0.619608, 1 )
+shader_param/shadow_color = Color( 0.0156863, 0.184314, 0.243137, 1 )
+shader_param/distortion_scale = Vector2( 0.5, 0.5 )
+shader_param/distortion_time_scale = 0.041
+shader_param/distortion_amplitude = 0.011
+shader_param/tile_factor = 0.961
+shader_param/water_time_scale = 0.197
 shader_param/reflection_intensity = 0.437
-shader_param/transform = Basis( 1, 0, 0, 0.279, 1.8, 0.55, 0, 0, 1 )
-shader_param/parallax_factor = 0.441
-shader_param/shore_color = Color( 0.811765, 0.811765, 0.811765, 1 )
+shader_param/transform = Basis( 1, 0, 0, 0, 1, 0, 0, 0, 1 )
+shader_param/parallax_factor = 0.2
+shader_param/shore_color = Color( 0.231373, 0.486275, 0.639216, 1 )
 shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
-shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 0.39685
+shader_param/scale = Vector2( 1, 2.458 )
+shader_param/zoom_y = 0.943874
 shader_param/aspect_ratio = 1.0
-shader_param/transition_gradient = SubResource( 50 )
+shader_param/transition_gradient = SubResource( 57 )
 shader_param/distortion_map = ExtResource( 5 )
 
 [node name="test" type="Node2D"]
@@ -290,18 +290,6 @@ text = "Current mode = EASY"
 fit_content_height = true
 scroll_active = false
 
-[node name="Dialog" parent="HUD" instance=ExtResource( 11 )]
-light_mask = 0
-margin_left = 22.0
-margin_top = 13.0
-margin_right = 22.0
-margin_bottom = 13.0
-timeline = "timeline-1660787886.json"
-
-[node name="dialog_control" type="Node" parent="HUD"]
-script = ExtResource( 12 )
-froggiePath = NodePath("../../player/froggie")
-
 [node name="fadein" type="CanvasLayer" parent="."]
 layer = 2
 
@@ -356,7 +344,6 @@ motion_mirroring = Vector2( 1346.67, 0 )
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
 modulate = Color( 0.654902, 0.654902, 0.529412, 1 )
-position = Vector2( 0, 336 )
 scale = Vector2( 1.054, 0.89 )
 texture = ExtResource( 16 )
 centered = false
@@ -366,7 +353,7 @@ position = Vector2( 2190, -953 )
 texture = ExtResource( 3 )
 texture_scale = 10.0
 color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
-energy = 2.05
+energy = 1.85
 range_layer_min = -3
 range_layer_max = 3
 shadow_enabled = true
@@ -378,7 +365,6 @@ shadow_filter_smooth = 1.5
 material = SubResource( 53 )
 position = Vector2( 1973, 415 )
 rotation = 0.280427
-scale = Vector2( 1, 1 )
 texture = ExtResource( 18 )
 
 [node name="tree3" type="Sprite" parent="."]
@@ -411,6 +397,12 @@ position = Vector2( 0, 20.684 )
 [node name="weapon" parent="player" index="8"]
 visible = false
 
+[node name="crate" parent="." instance=ExtResource( 12 )]
+position = Vector2( 1507, 471 )
+
+[node name="crate2" parent="." instance=ExtResource( 12 )]
+position = Vector2( 421, 441 )
+
 [node name="ground1" type="StaticBody2D" parent="." groups=["DIRT", "GROUND"]]
 process_priority = 1
 position = Vector2( 2456, 276 )
@@ -425,19 +417,22 @@ texture = ExtResource( 10 )
 texture_scale = Vector2( 0.5, 0.986 )
 polygon = PoolVector2Array( -3212, 271, -2958, 193, -2741, 155, -2664, 208, -2582, 273, -2474, 307, -2343, 287, -2178, 218, -2072, 192, -1928, 182, -1825, 176, -1789, 236, -1721, 294, -1592, 481, -1424, 519, -1314, 495, -1267, 340, -1134, 279, -1056, 225, -865, 212, -577, 217, -480, 270, -399, 386, -342, 827, -1239, 846, -1535, 859, -1989, 848, -2240, 840, -2510, 856, -2858, 851, -3393, 853, -3396, 673, -3371, 402 )
 
+[node name="swing_point" parent="." instance=ExtResource( 15 )]
+position = Vector2( 1010, 379 )
+
 [node name="water_area" type="Area2D" parent="."]
 position = Vector2( 1906.11, 946.629 )
 scale = Vector2( 22.6719, 2.31641 )
 collision_layer = 0
 collision_mask = 33
-script = SubResource( 47 )
+script = SubResource( 54 )
 
 [node name="col" type="CollisionShape2D" parent="water_area"]
 position = Vector2( 0.967445, 28.7718 )
-shape = SubResource( 48 )
+shape = SubResource( 55 )
 
 [node name="water" type="Sprite" parent="."]
-material = SubResource( 51 )
+material = SubResource( 58 )
 position = Vector2( -980, 602 )
 scale = Vector2( 22.6719, 2.31641 )
 texture = ExtResource( 7 )
@@ -447,10 +442,12 @@ script = ExtResource( 8 )
 
 [node name="cam_trans" type="RemoteTransform2D" parent="."]
 
-[node name="swing_point" parent="." instance=ExtResource( 15 )]
-position = Vector2( 1010, 379 )
+[node name="ambience" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 11 )
+volume_db = -20.0
+autoplay = true
+bus = "Ambience"
 
-[connection signal="dialogic_signal" from="HUD/Dialog" to="HUD/dialog_control" method="_on_Dialog_dialogic_signal"]
 [connection signal="body_entered" from="water_area" to="water_area" method="_on_water_area_body_entered"]
 [connection signal="body_exited" from="water_area" to="water_area" method="_on_water_area_body_exited"]
 

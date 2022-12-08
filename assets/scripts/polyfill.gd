@@ -3,6 +3,7 @@ extends StaticBody2D
 func _ready():
 	var col = CollisionPolygon2D.new()
 	var poly = $Polygon2D.get_polygon()
+	$Polygon2D.set_offset(Vector2(0,-5))
 	col.set_polygon(poly)
 	add_child(col)
 	
