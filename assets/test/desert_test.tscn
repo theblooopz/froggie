@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=2]
+[gd_scene load_steps=39 format=2]
 
 [ext_resource path="res://assets/environment/clouds_noise1.tres" type="Texture" id=1]
 [ext_resource path="res://assets/environment/clouds2D.shader" type="Shader" id=2]
@@ -19,6 +19,7 @@
 [ext_resource path="res://assets/scripts/wind.shader" type="Shader" id=17]
 [ext_resource path="res://assets/environment/trees/Pirates!_PalmTree02_sprite01.png" type="Texture" id=18]
 [ext_resource path="res://assets/environment/trees/Pirates!_PalmTree03_sprite01.png" type="Texture" id=19]
+[ext_resource path="res://assets/frogcoin/frogcoin.tscn" type="PackedScene" id=20]
 
 [sub_resource type="GDScript" id=43]
 script/source = "extends MarginContainer
@@ -169,9 +170,6 @@ func _on_water_area_body_exited(body):
 			si.get_node(\"AnimationPlayer\").play(\"splash\")
 "
 
-[sub_resource type="RectangleShape2D" id=55]
-extents = Vector2( 128.819, 140.184 )
-
 [sub_resource type="Gradient" id=56]
 offsets = PoolRealArray( 0.502164, 1 )
 
@@ -185,20 +183,23 @@ shader_param/shadow_color = Color( 0.0156863, 0.184314, 0.243137, 1 )
 shader_param/distortion_scale = Vector2( 0.5, 0.5 )
 shader_param/distortion_time_scale = 0.041
 shader_param/distortion_amplitude = 0.011
-shader_param/tile_factor = 0.961
-shader_param/water_time_scale = 0.197
-shader_param/reflection_intensity = 0.437
+shader_param/tile_factor = 0.922
+shader_param/water_time_scale = 0.1
+shader_param/reflection_intensity = 0.349
 shader_param/transform = Basis( 1, 0, 0, 0, 1, 0, 0, 0, 1 )
-shader_param/parallax_factor = 0.2
+shader_param/parallax_factor = 0.308
 shader_param/shore_color = Color( 0.231373, 0.486275, 0.639216, 1 )
-shader_param/shore_size = 0.03
-shader_param/shore_smoothness = 0.017
-shader_param/shore_height_factor = 0.1
-shader_param/scale = Vector2( 1, 2.458 )
-shader_param/zoom_y = 0.943874
+shader_param/shore_size = 0.017
+shader_param/shore_smoothness = 0.01
+shader_param/shore_height_factor = 0.047
+shader_param/scale = Vector2( 24.9914, 3.32031 )
+shader_param/zoom_y = 1.0
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 57 )
 shader_param/distortion_map = ExtResource( 5 )
+
+[sub_resource type="RectangleShape2D" id=55]
+extents = Vector2( 3162.5, 353.414 )
 
 [node name="test" type="Node2D"]
 
@@ -340,7 +341,7 @@ scroll_ignore_camera_zoom = true
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 light_mask = 0
 motion_scale = Vector2( 0.006, 0 )
-motion_mirroring = Vector2( 1346.67, 0 )
+motion_mirroring = Vector2( 1347.22, 0 )
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
 modulate = Color( 0.654902, 0.654902, 0.529412, 1 )
@@ -349,7 +350,7 @@ texture = ExtResource( 16 )
 centered = false
 
 [node name="sun" type="Light2D" parent="."]
-position = Vector2( 2190, -953 )
+position = Vector2( 3568, -770 )
 texture = ExtResource( 3 )
 texture_scale = 10.0
 color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
@@ -367,13 +368,6 @@ position = Vector2( 1973, 415 )
 rotation = 0.280427
 texture = ExtResource( 18 )
 
-[node name="tree3" type="Sprite" parent="."]
-material = SubResource( 53 )
-position = Vector2( 1555, 380 )
-rotation = -0.290618
-scale = Vector2( -1, 1 )
-texture = ExtResource( 19 )
-
 [node name="tree" type="Sprite" parent="."]
 material = SubResource( 53 )
 position = Vector2( 625, 319 )
@@ -388,8 +382,18 @@ texture = ExtResource( 14 )
 position = Vector2( 6, 22 )
 occluder = SubResource( 52 )
 
+[node name="tree3" type="Sprite" parent="."]
+material = SubResource( 53 )
+position = Vector2( 1555, 380 )
+rotation = 2.85097
+scale = Vector2( 1, -1 )
+texture = ExtResource( 19 )
+
 [node name="player" parent="." instance=ExtResource( 13 )]
 position = Vector2( 489, 443 )
+
+[node name="camera" parent="player" index="0"]
+limit_right = 5645
 
 [node name="dust" parent="player" index="1"]
 position = Vector2( 0, 20.684 )
@@ -403,6 +407,20 @@ position = Vector2( 1507, 471 )
 [node name="crate2" parent="." instance=ExtResource( 12 )]
 position = Vector2( 421, 441 )
 
+[node name="ground2" type="StaticBody2D" parent="." groups=["DIRT", "GROUND"]]
+process_priority = 1
+position = Vector2( 5810, 247 )
+collision_layer = 2
+script = ExtResource( 9 )
+
+[node name="Polygon2D" type="Polygon2D" parent="ground2"]
+position = Vector2( 0, 7 )
+color = Color( 0.901961, 0.890196, 0.862745, 1 )
+antialiased = true
+texture = ExtResource( 10 )
+texture_scale = Vector2( 0.5, 0.986 )
+polygon = PoolVector2Array( -3212, 271, -2958, 193, -2741, 155, -2664, 208, -2582, 273, -2474, 307, -2343, 287, -2178, 218, -2072, 192, -1924, 288, -1592, 481, -1416, 512, -1156, 374, -924, -39, -807, -204, -511, -236, -397, -144, -308, 259, -283, 478, -299, 682, -342, 827, -1239, 846, -1535, 859, -1989, 848, -2240, 840, -2510, 856, -2858, 851, -3393, 853, -3396, 673, -3371, 402 )
+
 [node name="ground1" type="StaticBody2D" parent="." groups=["DIRT", "GROUND"]]
 process_priority = 1
 position = Vector2( 2456, 276 )
@@ -415,30 +433,35 @@ color = Color( 0.901961, 0.890196, 0.862745, 1 )
 antialiased = true
 texture = ExtResource( 10 )
 texture_scale = Vector2( 0.5, 0.986 )
-polygon = PoolVector2Array( -3212, 271, -2958, 193, -2741, 155, -2664, 208, -2582, 273, -2474, 307, -2343, 287, -2178, 218, -2072, 192, -1928, 182, -1825, 176, -1789, 236, -1721, 294, -1592, 481, -1424, 519, -1314, 495, -1267, 340, -1134, 279, -1056, 225, -865, 212, -577, 217, -480, 270, -399, 386, -342, 827, -1239, 846, -1535, 859, -1989, 848, -2240, 840, -2510, 856, -2858, 851, -3393, 853, -3396, 673, -3371, 402 )
+polygon = PoolVector2Array( -3212, 271, -2958, 193, -2741, 155, -2664, 208, -2582, 273, -2474, 307, -2343, 287, -2178, 218, -2072, 192, -1928, 182, -1825, 176, -1789, 236, -1721, 294, -1592, 481, -1416, 512, -1314, 495, -1267, 340, -1134, 279, -1056, 225, -865, 212, -577, 217, -480, 270, -399, 386, -342, 827, -1239, 846, -1535, 859, -1989, 848, -2240, 840, -2510, 856, -2858, 851, -3393, 853, -3396, 673, -3371, 402 )
+
+[node name="swing_point2" parent="." instance=ExtResource( 15 )]
+position = Vector2( 2328, 272 )
 
 [node name="swing_point" parent="." instance=ExtResource( 15 )]
 position = Vector2( 1010, 379 )
 
+[node name="swing_point3" parent="." instance=ExtResource( 15 )]
+position = Vector2( 4319, 269 )
+
 [node name="water_area" type="Area2D" parent="."]
-position = Vector2( 1906.11, 946.629 )
-scale = Vector2( 22.6719, 2.31641 )
+position = Vector2( -299, 791 )
 collision_layer = 0
 collision_mask = 33
 script = SubResource( 54 )
 
-[node name="col" type="CollisionShape2D" parent="water_area"]
-position = Vector2( 0.967445, 28.7718 )
-shape = SubResource( 55 )
-
-[node name="water" type="Sprite" parent="."]
+[node name="water" type="Sprite" parent="water_area"]
 material = SubResource( 58 )
-position = Vector2( -980, 602 )
-scale = Vector2( 22.6719, 2.31641 )
+position = Vector2( -327, -160 )
+scale = Vector2( 24.9914, 3.32031 )
 texture = ExtResource( 7 )
 normal_map = ExtResource( 6 )
 centered = false
 script = ExtResource( 8 )
+
+[node name="col" type="CollisionShape2D" parent="water_area"]
+position = Vector2( 2880.5, 271.413 )
+shape = SubResource( 55 )
 
 [node name="cam_trans" type="RemoteTransform2D" parent="."]
 
@@ -447,6 +470,39 @@ stream = ExtResource( 11 )
 volume_db = -20.0
 autoplay = true
 bus = "Ambience"
+
+[node name="frogcoin" parent="." instance=ExtResource( 20 )]
+position = Vector2( 1768, 359 )
+
+[node name="frogcoin3" parent="." instance=ExtResource( 20 )]
+position = Vector2( 3146, 408 )
+
+[node name="frogcoin4" parent="." instance=ExtResource( 20 )]
+position = Vector2( 3201, 448 )
+
+[node name="frogcoin5" parent="." instance=ExtResource( 20 )]
+position = Vector2( 3259, 480 )
+
+[node name="frogcoin6" parent="." instance=ExtResource( 20 )]
+position = Vector2( 3329, 502 )
+
+[node name="frogcoin7" parent="." instance=ExtResource( 20 )]
+position = Vector2( 3403, 495 )
+
+[node name="frogcoin8" parent="." instance=ExtResource( 20 )]
+position = Vector2( 3466, 486 )
+
+[node name="frogcoin9" parent="." instance=ExtResource( 20 )]
+position = Vector2( 3530, 467 )
+
+[node name="frogcoin10" parent="." instance=ExtResource( 20 )]
+position = Vector2( 3590, 446 )
+
+[node name="frogcoin11" parent="." instance=ExtResource( 20 )]
+position = Vector2( 3659, 423 )
+
+[node name="frogcoin2" parent="." instance=ExtResource( 20 )]
+position = Vector2( 4, 424 )
 
 [connection signal="body_entered" from="water_area" to="water_area" method="_on_water_area_body_entered"]
 [connection signal="body_exited" from="water_area" to="water_area" method="_on_water_area_body_exited"]

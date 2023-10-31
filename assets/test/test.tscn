@@ -111,13 +111,13 @@ colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
 gradient = SubResource( 15 )
 
 [sub_resource type="Gradient" id=32]
-offsets = PoolRealArray( 0.416309, 1 )
-colors = PoolColorArray( 0, 0.935547, 1, 1, 0, 0.425, 0.5, 1 )
+offsets = PoolRealArray( 0.401274, 1 )
+colors = PoolColorArray( 0.678431, 0.976471, 0.976471, 1, 0.5313, 0.77, 0.77, 1 )
 
 [sub_resource type="GradientTexture2D" id=36]
 gradient = SubResource( 32 )
 fill = 1
-fill_from = Vector2( 0.858333, 0.190625 )
+fill_from = Vector2( 0.940367, 0.103784 )
 fill_to = Vector2( 0, 0 )
 
 [sub_resource type="ShaderMaterial" id=14]
@@ -223,7 +223,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 1.49831
+shader_param/zoom_y = 2.11893
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 37 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -389,7 +389,8 @@ motion_scale = Vector2( 0.006, 0 )
 motion_mirroring = Vector2( 1346.67, 0 )
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
-modulate = Color( 0.6248, 0.71, 0.5396, 1 )
+visible = false
+modulate = Color( 0.878431, 0.913725, 0.839216, 1 )
 scale = Vector2( 3.509, 3.509 )
 texture = ExtResource( 33 )
 centered = false
@@ -400,14 +401,14 @@ motion_scale = Vector2( 0.004, 0 )
 motion_mirroring = Vector2( 1363.24, 0 )
 
 [node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
-modulate = Color( 0.882353, 1, 0.760784, 1 )
+modulate = Color( 0.645676, 0.818277, 0.847656, 1 )
 position = Vector2( 0, 295 )
 scale = Vector2( 3.55093, 3.55093 )
 texture = ExtResource( 35 )
 centered = false
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
-modulate = Color( 0.882353, 1, 0.760784, 1 )
+modulate = Color( 0.701961, 0.831373, 0.839216, 1 )
 scale = Vector2( 3.55093, 3.55093 )
 texture = ExtResource( 35 )
 centered = false
@@ -435,7 +436,7 @@ position = Vector2( 3425, -371 )
 texture = ExtResource( 14 )
 texture_scale = 10.0
 color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
-energy = 1.66
+energy = 1.25
 range_layer_min = -3
 range_layer_max = 3
 shadow_enabled = true
@@ -703,6 +704,9 @@ position = Vector2( 2466, 469 )
 [node name="dust" parent="player" index="1"]
 position = Vector2( 0, 20.684 )
 
+[node name="weapon" parent="player" index="8"]
+visible = false
+
 [node name="objects" type="Node2D" parent="."]
 position = Vector2( 255, 290 )
 
@@ -879,7 +883,7 @@ polygon = PoolVector2Array( -2212, 106, -2449, 103, -2473, 104, -2479, 123, -247
 
 [node name="grassline" type="Line2D" parent="ground/ground1"]
 position = Vector2( -2468, 90 )
-points = PoolVector2Array( -11, 0, 342, 7, 532, -4 )
+points = PoolVector2Array( -7, 7, 332, 13, 533, 10 )
 width = 32.0
 default_color = Color( 0.639216, 0.831373, 0.329412, 1 )
 texture = ExtResource( 24 )
@@ -889,7 +893,7 @@ round_precision = 6
 
 [node name="grassline2" type="Line2D" parent="ground/ground1"]
 position = Vector2( -1574, 98 )
-points = PoolVector2Array( -9, 1, 453, -5, 571, 3 )
+points = PoolVector2Array( -11, 15, 452, 6, 577, 14 )
 width = 32.0
 default_color = Color( 0.639216, 0.831373, 0.329412, 1 )
 texture = ExtResource( 24 )
@@ -948,7 +952,7 @@ polygon = PoolVector2Array( -2208, 92, -2443, 85, -2514, 82, -2577, 59, -2664, 5
 [node name="grassline3" type="Line2D" parent="ground/ground2"]
 position = Vector2( -2522.64, 1.27368 )
 rotation = 0.114333
-points = PoolVector2Array( -139.081, 63.0045, -44.0493, 49.072, 21.8145, 61.6401, 225.086, 52.3896, 519.61, 22.5945, 584.528, 18.1595 )
+points = PoolVector2Array( -139.081, 63.0045, -42.9084, 59.0068, 20.2031, 73.904, 225.086, 52.3896, 520.718, 23.474, 583.763, 20.2606 )
 width = 32.0
 default_color = Color( 0.639216, 0.831373, 0.329412, 1 )
 texture = ExtResource( 24 )
@@ -1050,7 +1054,7 @@ polygon = PoolVector2Array( -2207.79, 38.3766, -2454.63, 14.0576, -2524.97, 13.0
 [node name="grassline3" type="Line2D" parent="ground/ground3"]
 position = Vector2( -2522.37, 1.93698 )
 rotation = 0.114333
-points = PoolVector2Array( -9, -1, 216, -10, 370, -14 )
+points = PoolVector2Array( -3.32251, 3.65527, 218.732, -3.87, 370.762, -7.86035 )
 width = 32.0
 default_color = Color( 0.639216, 0.831373, 0.329412, 1 )
 texture = ExtResource( 24 )
@@ -1072,7 +1076,7 @@ round_precision = 6
 [node name="grassline5" type="Line2D" parent="ground/ground3"]
 position = Vector2( -2394.88, -345.789 )
 rotation = 0.114333
-points = PoolVector2Array( -10.0002, -1.99997, 533, 1.00003 )
+points = PoolVector2Array( -11.9082, 2.1683, 535.086, 4.80147 )
 width = 32.0
 default_color = Color( 0.639216, 0.831373, 0.329412, 1 )
 texture = ExtResource( 24 )

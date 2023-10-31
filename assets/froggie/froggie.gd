@@ -130,7 +130,7 @@ func apply_gravity(state, direction):
 	
 	if jumping:
 		motion.y -= JUMP_FORCE * step
-	
+
 	if canmove:
 		var s = _SPEED*direction
 		motion.x += lerp(motion.x, s, ACCELERATION_FACTOR) *step
@@ -189,6 +189,10 @@ func _integrate_forces(state):
 	if not direction or not groundray.is_colliding():
 		if $footstep.is_playing(): $footstep.stop()
 		if dust.is_emitting(): dust.set_emitting(false)
+	elif groundray.is_colliding():
+		if not $footstep.is_playing() and not rolling: $footstep.play()
+		if groundray.get_collider().is_in_group("DIRT"):
+			if not dust.is_emitting(): dust.set_emitting(true)
 	
 	
 	if swinging and anchor:

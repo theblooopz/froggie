@@ -33,9 +33,9 @@ func get_play_mode():
 	var froggie = get_node("/root/test/player/froggie")
 	froggie.easy_mode = easy_mode
 	if not froggie.easy_mode:
-		label.set_bbcode("Current mode = [color=red]HARD[/color]")
+		if label: label.set_bbcode("Current mode = [color=red]HARD[/color]")
 	else:
-		label.set_bbcode("Current mode = [color=green]EASY[/color]")
+		if label: label.set_bbcode("Current mode = [color=green]EASY[/color]")
 		
 	return easy_mode
 		

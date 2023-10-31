@@ -1,34 +1,52 @@
-[gd_scene load_steps=31 format=2]
+[gd_scene load_steps=49 format=2]
 
 [ext_resource path="res://assets/froggie/froggie.gd" type="Script" id=1]
 [ext_resource path="res://assets/froggie/froggieSprite0007.png" type="Texture" id=2]
-[ext_resource path="res://assets/froggie/froggieSprite0012.png" type="Texture" id=3]
+[ext_resource path="res://assets/froggie/froggie3d_run/0008.png" type="Texture" id=3]
 [ext_resource path="res://assets/froggie/froggieSprite0004.png" type="Texture" id=4]
 [ext_resource path="res://assets/froggie/froggieSprite0006.png" type="Texture" id=5]
 [ext_resource path="res://assets/froggie/froggieSprite0001.png" type="Texture" id=6]
 [ext_resource path="res://assets/froggie/froggieSprite0003.png" type="Texture" id=7]
-[ext_resource path="res://assets/froggie/froggieSprite0014.png" type="Texture" id=8]
+[ext_resource path="res://assets/froggie/froggie3d_run/0007.png" type="Texture" id=8]
 [ext_resource path="res://assets/froggie/froggieSprite0010.png" type="Texture" id=9]
 [ext_resource path="res://assets/froggie/froggieSprite0011.png" type="Texture" id=10]
 [ext_resource path="res://assets/froggie/froggieSprite0008.png" type="Texture" id=11]
 [ext_resource path="res://assets/froggie/froggieSprite0009.png" type="Texture" id=12]
 [ext_resource path="res://assets/froggie/froggieSprite0005.png" type="Texture" id=13]
 [ext_resource path="res://assets/froggie/froggieSprite0002.png" type="Texture" id=14]
-[ext_resource path="res://assets/froggie/froggieSprite0013.png" type="Texture" id=15]
+[ext_resource path="res://assets/froggie/froggie3d_run/0021.png" type="Texture" id=15]
 [ext_resource path="res://assets/froggie/dust_particle.png" type="Texture" id=16]
 [ext_resource path="res://assets/audio/mud02.ogg" type="AudioStream" id=17]
 [ext_resource path="res://assets/weapons/weapon.tscn" type="PackedScene" id=18]
+[ext_resource path="res://assets/froggie/froggie3d_run/0013.png" type="Texture" id=20]
+[ext_resource path="res://assets/froggie/froggie3d_run/0001.png" type="Texture" id=21]
+[ext_resource path="res://assets/froggie/froggie3d_run/0012.png" type="Texture" id=22]
+[ext_resource path="res://assets/froggie/froggie3d_run/0010.png" type="Texture" id=23]
+[ext_resource path="res://assets/froggie/froggie3d_run/0011.png" type="Texture" id=24]
+[ext_resource path="res://assets/froggie/froggie3d_run/0009.png" type="Texture" id=25]
+[ext_resource path="res://assets/froggie/froggie3d_run/0005.png" type="Texture" id=26]
+[ext_resource path="res://assets/froggie/froggie3d_run/0003.png" type="Texture" id=27]
+[ext_resource path="res://assets/froggie/froggie3d_run/0006.png" type="Texture" id=28]
+[ext_resource path="res://assets/froggie/froggie3d_run/0020.png" type="Texture" id=29]
+[ext_resource path="res://assets/froggie/froggie3d_run/0019.png" type="Texture" id=30]
+[ext_resource path="res://assets/froggie/froggie3d_run/0016.png" type="Texture" id=31]
+[ext_resource path="res://assets/froggie/froggie3d_run/0017.png" type="Texture" id=32]
+[ext_resource path="res://assets/froggie/froggie3d_run/0004.png" type="Texture" id=33]
+[ext_resource path="res://assets/froggie/froggie3d_run/0002.png" type="Texture" id=34]
+[ext_resource path="res://assets/froggie/froggie3d_run/0018.png" type="Texture" id=35]
+[ext_resource path="res://assets/froggie/froggie3d_run/0014.png" type="Texture" id=36]
+[ext_resource path="res://assets/froggie/froggie3d_run/0015.png" type="Texture" id=37]
 
 [sub_resource type="Curve" id=31]
 _data = [ Vector2( 0, 0.235227 ), 0.0, 0.488648, 0, 0, Vector2( 1, 0.6625 ), -0.106294, 0.0, 0, 0 ]
 
 [sub_resource type="Gradient" id=32]
-offsets = PoolRealArray( 0.757202, 0.897119, 1 )
+offsets = PoolRealArray( 0.624309, 0.897119, 1 )
 colors = PoolColorArray( 1, 1, 1, 0.8, 1, 1, 1, 0, 1, 1, 1, 0 )
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
-"frames": [ ExtResource( 15 ) ],
+"frames": [ ExtResource( 27 ) ],
 "loop": true,
 "name": "air",
 "speed": 5.0
@@ -38,15 +56,15 @@ animations = [ {
 "name": "dance",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 3 ) ],
+"frames": [ ExtResource( 28 ) ],
 "loop": true,
 "name": "idle",
 "speed": 12.0
 }, {
-"frames": [ ExtResource( 3 ), ExtResource( 15 ), ExtResource( 8 ) ],
+"frames": [ ExtResource( 28 ), ExtResource( 8 ), ExtResource( 3 ), ExtResource( 25 ), ExtResource( 23 ), ExtResource( 24 ), ExtResource( 22 ), ExtResource( 20 ), ExtResource( 36 ), ExtResource( 37 ), ExtResource( 31 ), ExtResource( 32 ), ExtResource( 35 ), ExtResource( 30 ), ExtResource( 29 ), ExtResource( 15 ), ExtResource( 21 ), ExtResource( 34 ), ExtResource( 27 ), ExtResource( 33 ), ExtResource( 26 ) ],
 "loop": true,
 "name": "run",
-"speed": 5.0
+"speed": 30.0
 } ]
 
 [sub_resource type="CircleShape2D" id=4]
@@ -125,10 +143,11 @@ smoothing_speed = 3.5
 editor_draw_limits = true
 
 [node name="dust" type="CPUParticles2D" parent="."]
+light_mask = 0
 position = Vector2( 0, 20.684 )
 emitting = false
-amount = 64
-lifetime = 2.0
+amount = 128
+lifetime = 1.5
 speed_scale = 0.75
 lifetime_randomness = 0.06
 local_coords = false
@@ -144,11 +163,11 @@ angle = 520.9
 angle_random = 0.47
 scale_amount = 0.38
 scale_amount_curve = SubResource( 31 )
-color = Color( 0.847059, 0.686275, 0.560784, 1 )
+color = Color( 1, 0.815686, 0.580392, 1 )
 color_ramp = SubResource( 32 )
 
 [node name="tongue_ray" type="RayCast2D" parent="."]
-position = Vector2( 2, -12 )
+position = Vector2( 2, -15 )
 enabled = true
 cast_to = Vector2( 25, 25 )
 collision_mask = 66
@@ -188,7 +207,7 @@ position = Vector2( 0, 1 )
 shape = SubResource( 4 )
 
 [node name="tongue_start" type="Node2D" parent="froggie"]
-position = Vector2( 2, -12 )
+position = Vector2( 2, -15 )
 
 [node name="tongue_ray2" type="RemoteTransform2D" parent="froggie/tongue_start"]
 remote_path = NodePath("../../../tongue_ray")
@@ -272,7 +291,6 @@ update_rotation = false
 
 [node name="footstep" type="AudioStreamPlayer" parent="froggie"]
 stream = ExtResource( 17 )
-volume_db = -20.0
 pitch_scale = 0.95
 bus = "SFX"
 
