@@ -29,11 +29,11 @@
 [ext_resource path="res://assets/environment/trees/10.png" type="Texture" id=27]
 [ext_resource path="res://assets/environment/trees/22.png" type="Texture" id=28]
 [ext_resource path="res://assets/objects/seesaw.tscn" type="PackedScene" id=29]
+[ext_resource path="res://assets/environment/grassy_mountains/grassy_mountains_fc-transformed.png" type="Texture" id=30]
 [ext_resource path="res://assets/environment/trees/16.png" type="Texture" id=31]
 [ext_resource path="res://assets/objects/rope.tscn" type="PackedScene" id=32]
 [ext_resource path="res://assets/environment/grassy_mountains/far_mountains_fc.png" type="Texture" id=33]
 [ext_resource path="res://assets/objects/mushroom1.tscn" type="PackedScene" id=34]
-[ext_resource path="res://assets/environment/grassy_mountains/grassy_mountains_fc.png" type="Texture" id=35]
 [ext_resource path="res://addons/dialogic/Dialog.tscn" type="PackedScene" id=36]
 [ext_resource path="res://assets/scripts/dialog_zoom.gd" type="Script" id=37]
 
@@ -223,7 +223,7 @@ shader_param/shore_size = 0.03
 shader_param/shore_smoothness = 0.017
 shader_param/shore_height_factor = 0.1
 shader_param/scale = Vector2( 22.6719, 2.31641 )
-shader_param/zoom_y = 2.11893
+shader_param/zoom_y = 0.500822
 shader_param/aspect_ratio = 1.0
 shader_param/transition_gradient = SubResource( 37 )
 shader_param/distortion_map = ExtResource( 6 )
@@ -389,28 +389,20 @@ motion_scale = Vector2( 0.006, 0 )
 motion_mirroring = Vector2( 1346.67, 0 )
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
-visible = false
 modulate = Color( 0.878431, 0.913725, 0.839216, 1 )
-scale = Vector2( 3.509, 3.509 )
+scale = Vector2( 1.755, 1.755 )
 texture = ExtResource( 33 )
 centered = false
 
 [node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
 light_mask = 0
-motion_scale = Vector2( 0.004, 0 )
+motion_scale = Vector2( 0.008, 0 )
 motion_mirroring = Vector2( 1363.24, 0 )
-
-[node name="Sprite2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
-modulate = Color( 0.645676, 0.818277, 0.847656, 1 )
-position = Vector2( 0, 295 )
-scale = Vector2( 3.55093, 3.55093 )
-texture = ExtResource( 35 )
-centered = false
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
 modulate = Color( 0.701961, 0.831373, 0.839216, 1 )
-scale = Vector2( 3.55093, 3.55093 )
-texture = ExtResource( 35 )
+scale = Vector2( 1.776, 1.776 )
+texture = ExtResource( 30 )
 centered = false
 
 [node name="birds" type="CanvasLayer" parent="."]
@@ -432,7 +424,7 @@ rotation = 2.74488
 scale = Vector2( 2, -2 )
 
 [node name="sun" type="Light2D" parent="."]
-position = Vector2( 3425, -371 )
+position = Vector2( 3197, -146 )
 texture = ExtResource( 14 )
 texture_scale = 10.0
 color = Color( 0.968627, 0.972549, 0.843137, 0.156863 )
@@ -443,6 +435,9 @@ shadow_enabled = true
 shadow_gradient_length = 52.6
 shadow_filter = 2
 shadow_filter_smooth = 1.5
+__meta__ = {
+"_edit_lock_": true
+}
 
 [node name="spikes" type="Node2D" parent="."]
 position = Vector2( 850.328, 622 )
